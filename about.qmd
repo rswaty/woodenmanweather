@@ -1,0 +1,22 @@
+---
+title: "About"
+format: html
+---
+
+## What this is
+
+Wooden Man Weather is a Marquette-focused weather dashboard and Monday work-week briefing. The dashboard shows National Weather Service forecasts, active alerts, and rolling twelve-month comparisons of temperature, precipitation, and snowfall against NOAA 1991–2020 normals for station [USW00094850](https://www.weather.gov/mqt/local_climate_information).
+
+## How it updates
+
+The site is built with [Quarto](https://quarto.org/) and published to GitHub Pages. A GitHub Actions workflow renders the project on pushes to `main` and on a daily schedule so forecasts and climate caches stay current without a Shiny server.
+
+## Attribution
+
+Forecast and alert data: [National Weather Service](https://www.weather.gov/). Historical observations and normals: [NOAA National Centers for Environmental Information](https://www.ncei.noaa.gov/). This is an independent project and is not endorsed by NOAA or the NWS.
+
+## Business plan
+
+The working business plan for Wooden Man Weather is kept in [BUSINESS_PLAN.md](https://github.com/rswaty/woodenmanweather/blob/main/BUSINESS_PLAN.md) in the repository root.
+
+[Back to the dashboard](index.qmd)

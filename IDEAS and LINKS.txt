@@ -1,0 +1,5 @@
+
+
+IDEAS and LINKS
+
+* weather data https://github.com/open-meteo/open-meteo

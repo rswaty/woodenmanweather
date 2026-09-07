@@ -1,0 +1,661 @@
+/*-- scss:defaults --*/
+$primary: #38bdf8;
+$secondary: #10b981;
+$success: #10b981;
+$info: #38bdf8;
+$warning: #f59e0b;
+$danger: #f43f5e;
+$body-bg: #06090e;
+$body-color: #cbd5e1;
+$headings-color: #ffffff;
+$link-color: #38bdf8;
+$navbar-bg: #090d13;
+$font-family-sans-serif: "Nirmala UI", "Nirmala", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-size-base: 1.02rem;
+$border-radius: 0.65rem;
+
+/*-- scss:rules --*/
+html,
+body,
+button,
+input,
+select,
+textarea,
+table,
+.navbar,
+.quarto-dashboard,
+.card,
+.wmw-chart-card,
+.wmw-outpost-card,
+text,
+svg text {
+  font-family: "Nirmala UI", "Nirmala", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+body {
+  background-color: $body-bg;
+  color: $body-color;
+}
+
+.navbar {
+  background: $navbar-bg !important;
+  border-bottom: 1px solid #1e293b;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-dark,
+.navbar[data-bs-theme="dark"],
+.navbar {
+  --bs-navbar-color: #94a3b8;
+  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-active-color: #38bdf8;
+  --bs-navbar-brand-color: #ffffff;
+  --bs-navbar-brand-hover-color: #38bdf8;
+}
+
+.navbar-brand,
+.navbar-title,
+.navbar-nav .nav-link {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.quarto-dashboard #quarto-dashboard-header,
+.quarto-dashboard #quarto-dashboard-header .navbar.slim,
+.quarto-dashboard #quarto-dashboard-header .navbar[data-bs-theme="dark"] {
+  display: none !important;
+}
+
+.quarto-dashboard.page-layout-custom {
+  background: #06090e !important;
+}
+
+.quarto-dashboard.page-layout-custom #quarto-content {
+  padding-top: 0.65rem;
+  background: #06090e !important;
+}
+
+.quarto-dashboard .bslib-card,
+.quarto-dashboard .card {
+  border: 1px solid #1e293b !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  background: #090d13 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.quarto-dashboard .card > .card-header,
+.quarto-dashboard .bslib-card > .card-header {
+  display: none !important;
+}
+
+.quarto-dashboard .card > .card-body,
+.quarto-dashboard .bslib-card > .card-body {
+  padding: 0 !important;
+  background: #090d13 !important;
+}
+
+.quarto-dashboard table {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Wooden Man Weather — Outpost Top Row Cards (Option 1: Field Slate & Pine)
+   ========================================================================== */
+
+.wmw-outpost-card,
+.wmw-outpost-card.html-fill-item,
+.wmw-outpost-card.html-fill-container {
+  background: #090d13 !important;
+  color: #e2e8f0 !important;
+  padding: 12px 16px 10px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  font-family: "Nirmala UI", "Nirmala", sans-serif !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.wmw-op-header,
+.wmw-op-header.html-fill-item,
+.wmw-op-header.html-fill-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding-bottom: 7px !important;
+  margin-bottom: 8px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  flex: 0 0 auto !important;
+}
+
+.wmw-op-title {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: #94a3b8 !important;
+  margin: 0 !important;
+}
+
+.wmw-op-badge {
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  letter-spacing: 0.04em !important;
+  white-space: nowrap !important;
+}
+
+.wmw-op-body,
+.wmw-op-body.html-fill-item,
+.wmw-op-body.html-fill-container {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-height: 0 !important;
+  gap: 6px !important;
+}
+
+p.wmw-human-headline,
+div.wmw-human-headline,
+.wmw-human-headline,
+.wmw-human-headline.html-fill-item,
+.wmw-human-headline.html-fill-container {
+  display: block !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.wmw-human-headline .wmw-hl-warm {
+  color: #f59e0b !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+.wmw-human-headline .wmw-hl-cold {
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+p.wmw-human-sub,
+div.wmw-human-sub,
+.wmw-human-sub,
+.wmw-human-sub.html-fill-item,
+.wmw-human-sub.html-fill-container {
+  display: block !important;
+  font-size: 0.82rem !important;
+  color: #94a3b8 !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+p.wmw-human-sub strong,
+.wmw-human-sub strong {
+  color: #f1f5f9 !important;
+  font-weight: 700 !important;
+}
+
+/* Earth Percentile Bar */
+.wmw-earth-bar-shell,
+.wmw-earth-bar-shell.html-fill-item,
+.wmw-earth-bar-shell.html-fill-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  margin: 4px 0 2px 0 !important;
+  flex: 0 0 auto !important;
+}
+
+.wmw-earth-bar-track {
+  position: relative !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+  background: linear-gradient(90deg, #38bdf8 0%, #34d399 35%, #f59e0b 70%, #f43f5e 100%) !important;
+  opacity: 0.85 !important;
+  width: 100% !important;
+}
+
+.wmw-earth-bar-pin {
+  position: absolute !important;
+  top: -4px !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 2.5px solid #f59e0b !important;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.8) !important;
+  transform: translateX(-50%) !important;
+  transition: left 0.3s ease !important;
+}
+
+.wmw-earth-bar-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 0.65rem !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+}
+
+.wmw-op-footer,
+.wmw-op-footer.html-fill-item,
+.wmw-op-footer.html-fill-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding-top: 8px !important;
+  margin-top: 6px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  font-size: 0.74rem !important;
+  flex: 0 0 auto !important;
+  flex-wrap: wrap !important;
+}
+
+.wmw-stat-pill,
+.wmw-stat-pill.html-fill-item,
+.wmw-stat-pill.html-fill-container {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  background: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  color: #94a3b8 !important;
+  font-size: 0.70rem !important;
+  white-space: nowrap !important;
+  flex: 0 0 auto !important;
+}
+
+.wmw-stat-pill strong {
+  color: #ffffff !important;
+  margin-left: 4px !important;
+}
+
+/* Big Lake & Woodstove Gauges */
+.wmw-gauge-list,
+.wmw-gauge-list.html-fill-item,
+.wmw-gauge-list.html-fill-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  flex: 1 1 auto !important;
+  justify-content: center !important;
+}
+
+.wmw-gauge-item,
+.wmw-gauge-item.html-fill-item,
+.wmw-gauge-item.html-fill-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  background: #0b111a !important;
+  border: 1px solid #1e293b !important;
+  padding: 5px 10px !important;
+  border-radius: 5px !important;
+  font-size: 0.78rem !important;
+  flex: 0 0 auto !important;
+}
+
+.wmw-gauge-label {
+  font-size: 0.70rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  color: #94a3b8 !important;
+  margin: 0 !important;
+}
+
+.wmw-gauge-val {
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+}
+
+.wmw-gauge-sub {
+  font-size: 0.68rem !important;
+  font-weight: 400 !important;
+  color: #64748b !important;
+}
+
+/* ==========================================================================
+   Wooden Man Weather — Crisp Scientific Dark Charts (Clean Static View)
+   ========================================================================== */
+
+/* Outer card container override for dark charts */
+.quarto-dashboard .card:has(.wmw-chart-card),
+.quarto-dashboard .bslib-card:has(.wmw-chart-card) {
+  background: #090d13 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.quarto-dashboard .card:has(.wmw-chart-card) > .card-header,
+.quarto-dashboard .bslib-card:has(.wmw-chart-card) > .card-header {
+  display: none !important;
+}
+
+.quarto-dashboard .card:has(.wmw-chart-card) > .card-body,
+.quarto-dashboard .bslib-card:has(.wmw-chart-card) > .card-body {
+  padding: 0 !important;
+  background: #090d13 !important;
+}
+
+.wmw-chart-card {
+  background: #090d13;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 14px 6px 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: "Nirmala UI", "Nirmala", sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Header: Clean title only, 100% width, zero clutter */
+.wmw-chart-header,
+.wmw-chart-header.html-fill-item,
+.wmw-chart-header.html-fill-container {
+  display: block !important;
+  width: 100% !important;
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  min-width: auto !important;
+  padding: 0 0 7px 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.wmw-chart-title {
+  display: block !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.01em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* Nav & Zoom Tools (Clean horizontal pill group pinned to the right) */
+.wmw-nav-tools,
+.wmw-nav-tools.html-fill-item,
+.wmw-nav-tools.html-fill-container {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 3px !important;
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  padding: 2px 4px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  min-height: auto !important;
+  min-width: auto !important;
+  white-space: nowrap !important;
+}
+
+.wmw-pill-btn {
+  display: inline-block !important;
+  background: transparent !important;
+  color: #94a3b8 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  padding: 2px 7px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+}
+
+.wmw-pill-btn:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.wmw-pill-btn.active {
+  background: #334155 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Chart Main Container (Pinned Y-Axis Pane + Scrollable Timeline) */
+.wmw-chart-main {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  flex: 1 1 auto !important;
+  position: relative !important;
+  min-height: 175px !important;
+  margin-top: 4px !important;
+  overflow: hidden !important;
+}
+
+/* Pinned Y-Axis Pane (Always 100% visible, never scrolls away!) */
+.wmw-y-axis-pane {
+  flex: 0 0 58px !important;
+  width: 58px !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 5 !important;
+  background: #090d13 !important;
+  user-select: none !important;
+}
+
+.wmw-y-axis-svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+.wmw-y-axis-unit {
+  fill: #94a3b8 !important;
+  font-size: 10.5px !important;
+  font-family: "Nirmala UI", "Nirmala", sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+}
+
+.wmw-y-axis-txt {
+  fill: #e2e8f0 !important;
+  font-size: 11.5px !important;
+  font-family: "Nirmala UI", "Nirmala", sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* Viewport & Scrolling Shell */
+.wmw-viewport-shell {
+  position: relative;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wmw-viewport {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+}
+
+.wmw-viewport::-webkit-scrollbar {
+  height: 3px;
+}
+
+.wmw-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wmw-viewport::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 2px;
+}
+
+.wmw-viewport::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+.wmw-viewport.grabbing {
+  cursor: grabbing;
+}
+
+.wmw-canvas-wrap {
+  height: 100%;
+  min-height: 170px;
+  position: relative;
+  transition: width 0.25s ease;
+}
+
+.wmw-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* SVG Elements & Styling */
+.wmw-bg-rect {
+  fill: #000000;
+}
+
+.wmw-normal-line {
+  fill: none;
+  stroke: #ffffff !important;
+  stroke-width: 2.8px !important;
+  stroke-dasharray: 7 4 !important;
+  opacity: 1 !important;
+}
+
+.wmw-obs-line {
+  fill: none;
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wmw-area-divergence {
+  stroke: none;
+}
+
+/* Crisp, Non-Overlapping Axes Labels */
+.wmw-axis-txt {
+  fill: #cbd5e1;
+  font-size: 13px;
+  font-family: "Nirmala UI", "Nirmala", sans-serif;
+  font-weight: 600;
+}
+
+.wmw-axis-txt.active {
+  fill: #ffffff;
+  font-weight: 800;
+}
+
+.wmw-y-axis-txt {
+  fill: #94a3b8;
+  font-size: 11.5px;
+  font-family: "Nirmala UI", "Nirmala", sans-serif;
+  font-weight: 600;
+}
+
+/* Clean Current Info Strip BELOW the chart */
+.wmw-chart-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 2px 2px 2px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+.wmw-bottom-current {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.wmw-stat-now-label {
+  font-size: 0.70rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+.wmw-stat-now-value {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.wmw-stat-now-diff {
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.wmw-bottom-current.badge-warm .wmw-stat-now-diff {
+  color: #f59e0b;
+}
+
+.wmw-bottom-current.badge-cold .wmw-stat-now-diff {
+  color: #38bdf8;
+}
+
+.wmw-bottom-current.badge-wet .wmw-stat-now-diff {
+  color: #10b981;
+}
+
+.wmw-bottom-current.badge-dry .wmw-stat-now-diff {
+  color: #f59e0b;
+}
+
+.wmw-bottom-current.badge-snow-high .wmw-stat-now-diff {
+  color: #a78bfa;
+}
+
+.wmw-bottom-current.badge-snow-low .wmw-stat-now-diff {
+  color: #818cf8;
+}
+
+.wmw-bottom-scroll-tip {
+  font-size: 0.68rem;
+  color: #64748b;
+}

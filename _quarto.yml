@@ -1,0 +1,43 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - monday.qmd
+    - about.qmd
+
+website:
+  title: "Wooden Man Weather"
+  description: "Marquette, Michigan weather dashboard and Monday work-week briefing."
+  navbar:
+    background: "#090d13"
+    foreground: "#f8fafc"
+    left:
+      - href: index.qmd
+        text: Dashboard
+      - href: monday.qmd
+        text: Monday briefing
+      - href: about.qmd
+        text: About
+    right:
+      - icon: github
+        href: https://github.com/rswaty/woodenmanweather
+        aria-label: GitHub repository
+
+format:
+  html:
+    theme:
+      light: [cosmo, styles/wooden.scss]
+    toc: false
+    smooth-scroll: true
+  dashboard:
+    theme:
+      light: [cosmo, styles/wooden.scss]
+
+execute:
+  freeze: auto
+  echo: false
+  warning: false
+  message: false
+
+editor: visual

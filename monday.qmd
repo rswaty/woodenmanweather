@@ -1,0 +1,68 @@
+---
+title: "Monday work-week briefing"
+subtitle: "Marquette, Michigan"
+format: html
+---
+
+```{r}
+#| include: false
+source("R/constants.R")
+source("R/nws.R")
+source("R/climate.R")
+source("R/tasks.R")
+
+library(dplyr)
+library(lubridate)
+
+nws_context <- wmw_nws_context()
+current <- wmw_nws_current_summary(nws_context)
+work_week <- wmw_nws_work_week(nws_context)
+rolling <- wmw_rolling_year_series()
+tasks <- wmw_monday_tasks(work_week = work_week, current = current, rolling = rolling)
+task_table <- wmw_tasks_dataframe(tasks)
+
+briefing_monday <- floor_date(with_tz(Sys.time(), "America/Detroit"), unit = "week", week_start = 1)
+briefing_friday <- briefing_monday + days(4)
+```
+
+## Week of `r format(briefing_monday, "%B %d")`–`r format(briefing_friday, "%d, %Y")`
+
+Wooden Man Weather publishes a practical outlook each Monday for the Marquette work week. Forecasts come from the National Weather Service; climate context uses NOAA daily summaries for station `r wmw_station_id()`.
+
+**Headline:** `r if (nrow(work_week) > 0) work_week$short_forecast[1] else current$description`
+
+**Observation:** `r wmw_format_f(current$temperature_f)` at `r current$station` (`r wmw_format_dt(current$observed_at)`).
+
+## Work-week strip
+
+```{r}
+if (nrow(work_week) == 0) {
+  cat("The NWS work-week periods are not available yet. Check the dashboard for the latest forecast.")
+} else {
+  knitr::kable(
+    work_week |>
+      transmute(
+        Day = name,
+        `High (°F)` = ifelse(is_daytime, temperature, NA_real_),
+        Forecast = short_forecast,
+        `Precip %` = probability_of_precipitation,
+        Wind = paste(wind_direction, wind_speed)
+      ),
+    align = "lcccc"
+  )
+}
+```
+
+## Wooden Man tasks
+
+```{r}
+knitr::kable(task_table, col.names = c("Task", "Guidance"), align = "ll")
+```
+
+## Data notes
+
+- Normals: `r wmw_normals_start_year()`–`r wmw_normals_end_year()` monthly averages for `r wmw_station_id()`.
+- Airport readings may differ from lakeshore or hilltop conditions.
+- This page is generated from rule-based seasonal triggers plus the current NWS forecast; edit `R/tasks.R` as the library grows.
+
+[Return to the dashboard](index.qmd)
