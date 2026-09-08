@@ -119,25 +119,25 @@ wmw_card_human_thermometer <- function(today_high) {
   ht <- wmw_calc_human_thermometer(today_high)
 
   accent_color <- if (ht$is_warmer_than_half) "#f59e0b" else "#38bdf8"
-  badge_text <- paste0("EARTH RANK: ", ht$percentile, "%")
+  badge_text <- paste0("DAILY HIGH RANK: ", ht$percentile, "%")
 
   headline_html <- if (ht$is_warmer_than_half) {
     paste0(
-      "Today in Marquette at <span class='wmw-hl-warm'>", ht$local_temp, "°F</span>, you are warmer than <span class='wmw-hl-warm'>",
+      "Today's high in Marquette of <span class='wmw-hl-warm'>", ht$local_temp, "°F</span> puts you warmer than <span class='wmw-hl-warm'>",
       ht$percentile, "% of humanity</span>."
     )
   } else {
     colder_pct <- 100 - ht$percentile
     paste0(
-      "Today in Marquette at <span class='wmw-hl-cold'>", ht$local_temp, "°F</span>, you are colder than <span class='wmw-hl-cold'>",
+      "Today's high in Marquette of <span class='wmw-hl-cold'>", ht$local_temp, "°F</span> leaves you colder than <span class='wmw-hl-cold'>",
       colder_pct, "% of humanity</span>."
     )
   }
 
   subtext_html <- if (ht$is_warmer_than_half) {
-    paste0("Out of 8.2 billion people on Earth today, approximately <strong>", ht$warmer_than_billions, " billion</strong> are in cooler air right now.")
+    paste0("Out of 8.2 billion people on Earth today, approximately <strong>", ht$warmer_than_billions, " billion</strong> have a cooler daytime high.")
   } else {
-    paste0("Out of 8.2 billion people on Earth today, approximately <strong>", ht$colder_than_billions, " billion</strong> are in warmer air right now.")
+    paste0("Out of 8.2 billion people on Earth today, approximately <strong>", ht$colder_than_billions, " billion</strong> have a warmer daytime high.")
   }
 
   # Scale bar position (clamped 4% to 96% for pin visibility)
@@ -165,7 +165,7 @@ wmw_card_human_thermometer <- function(today_high) {
     </div>
   </div>
   <div class='wmw-op-footer'>
-    <div class='wmw-stat-pill'>Marquette: <strong>", ht$local_temp, "°F</strong></div>
+    <div class='wmw-stat-pill'>Marquette High: <strong>", ht$local_temp, "°F</strong></div>
     <div class='wmw-stat-pill'>Global Median: <strong>", ht$global_median, "°F</strong></div>
     <div class='wmw-stat-pill'>Coldest: <strong>-62°F (Vostok)</strong></div>
     <div class='wmw-stat-pill'>Warmest: <strong>114°F (Kuwait)</strong></div>
@@ -219,8 +219,61 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date()) 
   </div>
   <div class='wmw-op-footer'>
     <div class='wmw-stat-pill'>Last Updated: <strong>", update_str, "</strong></div>
-    <div class='wmw-stat-pill'>Marquette: <strong>46.54°N</strong></div>
-    <div class='wmw-stat-pill'>Lake Elev: <strong>602 ft</strong></div>
+    <div class='wmw-stat-pill'>Station: <strong>Marquette 46.54°N</strong></div>
+  </div>
+</div>")
+
+  htmltools::HTML(html)
+}
+
+#' CARD 3: Left Column Notes & Logo Placeholder Widget
+wmw_card_sidebar_dispatch <- function() {
+  html <- paste0(
+"<div class='wmw-outpost-card wmw-sidebar-card'>
+  <div class='wmw-op-header'>
+    <span class='wmw-op-title'>Outpost Dispatch</span>
+    <span class='wmw-op-badge' style='border-color: rgba(245, 158, 11, 0.4); color: #f59e0b;'>Station Notes</span>
+  </div>
+  
+  <div class='wmw-op-body' style='justify-content: flex-start; gap: 12px;'>
+    <!-- Logo Placeholder Box -->
+    <div class='wmw-logo-box'>
+      <div class='wmw-logo-emblem'>
+        <svg width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='#38bdf8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'>
+          <path d='M12 2L2 7l10 5 10-5-10-5z'></path>
+          <path d='M2 17l10 5 10-5'></path>
+          <path d='M2 12l10 5 10-5'></path>
+        </svg>
+      </div>
+      <div class='wmw-logo-title'>Wooden Man Weather</div>
+      <div class='wmw-logo-sub'>Marquette · Lake Superior Outpost</div>
+      <div class='wmw-logo-tag'>[ Logo Placeholder ]</div>
+    </div>
+
+    <!-- Dispatch & Notes Section -->
+    <div class='wmw-notes-container'>
+      <div class='wmw-notes-header'>FIELD &amp; COMMUNITY NOTES</div>
+      
+      <div class='wmw-note-entry'>
+        <div class='wmw-note-date'>Seasonal Advisory</div>
+        <div class='wmw-note-text'>Early September lake breezes keep shore brisk. Check evening drafts as overnight lows begin dipping.</div>
+      </div>
+
+      <div class='wmw-note-entry'>
+        <div class='wmw-note-date'>Woodpile Prep</div>
+        <div class='wmw-note-text'>Ensure split hardwood is stacked and top-covered before late September lake gales set in.</div>
+      </div>
+
+      <div class='wmw-note-entry'>
+        <div class='wmw-note-date'>Monday Briefing</div>
+        <div class='wmw-note-text'>Work-week task timing, planting windows, and weather forecasts publish every Monday morning.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class='wmw-op-footer'>
+    <div class='wmw-stat-pill'>Dispatch: <strong>Live</strong></div>
+    <div class='wmw-stat-pill'>Grid: <strong>MQT 100,56</strong></div>
   </div>
 </div>")
 

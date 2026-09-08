@@ -1,7 +1,9 @@
 ---
 title: "Wooden Man Weather"
 subtitle: "Marquette & the central U.P."
-format: dashboard
+format:
+  dashboard:
+    orientation: columns
 ---
 
 ```{r}
@@ -24,35 +26,45 @@ today_period <- forecast[forecast$is_daytime, ]
 today_high <- if (nrow(today_period) > 0) today_period$temperature[1] else forecast$temperature[1]
 ```
 
-## Row {height=36%}
+## Column {width=20%}
 
-### Global Thermometer
+### Outpost Notes & Logo
+
+```{r}
+wmw_card_sidebar_dispatch()
+```
+
+## Column {width=80%}
+
+### Row {height=36%}
+
+#### Global Thermometer
 
 ```{r}
 wmw_card_human_thermometer(today_high)
 ```
 
-### Big Lake & Woodstove
+#### Big Lake & Woodstove
 
 ```{r}
 wmw_card_lake_woodstove(today_high, forecast)
 ```
 
-## Row {height=64%}
+### Row {height=64%}
 
-### Temperature
+#### Temperature
 
 ```{r}
 wmw_interactive_chart(rolling, "temperature", today_high = today_high)
 ```
 
-### Precipitation
+#### Precipitation
 
 ```{r}
 wmw_interactive_chart(rolling, "precipitation")
 ```
 
-### Snowfall
+#### Snowfall
 
 ```{r}
 wmw_interactive_chart(rolling, "snowfall")

@@ -32,7 +32,7 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
     tick_unit <- "°"
     unit_badge <- "°F"
     digits <- 0
-    title <- "Temperature: Today vs. Recent Historical Norms"
+    title <- "Daily Highs: Today vs. Recent Historical Norms"
     pos_color <- "#f59e0b"        # warm amber (above normal)
     neg_color <- "#38bdf8"        # crisp slate-cyan (below normal)
 
@@ -53,7 +53,7 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
     latest_obs_str <- paste0(round(latest_obs, 0), " °F")
 
     stat_label <- "Today's High:"
-    diff_context <- "vs. recent historical mean"
+    diff_context <- "vs. normal high"
     curr_color <- if (latest_obs >= latest_norm) pos_color else neg_color
 
   } else if (metric == "precipitation") {
