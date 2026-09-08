@@ -3,7 +3,7 @@ name: Update & Publish Dashboard
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 11,21 * * *" # Twice daily: 7:00 AM EDT (11:00 UTC) & 5:00 PM EDT (21:00 UTC)
+    - cron: "15 11,21 * * *" # Twice daily: 7:15 AM EDT (11:15 UTC) & 5:15 PM EDT (21:15 UTC) to avoid top-of-hour queue delay
   push:
     branches: [main]
     paths-ignore:
@@ -38,6 +38,7 @@ jobs:
 
       - name: Render dashboard
         run: |
+          rm -rf _freeze/index
           quarto render
 
       - name: Commit and push updates if changed

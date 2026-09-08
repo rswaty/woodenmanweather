@@ -4,6 +4,8 @@ subtitle: "Marquette & the central U.P."
 format:
   dashboard:
     orientation: columns
+execute:
+  freeze: false
 ---
 
 ```{r}
