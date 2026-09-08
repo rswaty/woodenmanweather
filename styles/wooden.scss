@@ -134,21 +134,21 @@ body {
 }
 
 .wmw-op-title {
-  font-size: 0.72rem !important;
+  font-size: 0.76rem !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
-  color: #94a3b8 !important;
+  color: #cbd5e1 !important;
   margin: 0 !important;
 }
 
 .wmw-op-badge {
-  font-size: 0.68rem !important;
+  font-size: 0.72rem !important;
   font-weight: 700 !important;
-  padding: 2px 8px !important;
+  padding: 2px 9px !important;
   border-radius: 4px !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
   letter-spacing: 0.04em !important;
   white-space: nowrap !important;
 }
@@ -277,19 +277,19 @@ p.wmw-human-sub strong,
   display: inline-flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  background: #0f172a !important;
-  border: 1px solid #1e293b !important;
-  padding: 3px 8px !important;
-  border-radius: 4px !important;
+  background: #111a26 !important;
+  border: 1px solid #233146 !important;
+  padding: 4px 10px !important;
+  border-radius: 5px !important;
   color: #94a3b8 !important;
-  font-size: 0.70rem !important;
+  font-size: 0.74rem !important;
   white-space: nowrap !important;
   flex: 0 0 auto !important;
 }
 
 .wmw-stat-pill strong {
-  color: #ffffff !important;
-  margin-left: 4px !important;
+  color: #f8fafc !important;
+  margin-left: 5px !important;
 }
 
 /* Big Lake & Woodstove Gauges */
@@ -298,7 +298,7 @@ p.wmw-human-sub strong,
 .wmw-gauge-list.html-fill-container {
   display: flex !important;
   flex-direction: column !important;
-  gap: 5px !important;
+  gap: 6px !important;
   flex: 1 1 auto !important;
   justify-content: center !important;
 }
@@ -310,34 +310,35 @@ p.wmw-human-sub strong,
   flex-direction: row !important;
   justify-content: space-between !important;
   align-items: center !important;
-  background: #0b111a !important;
-  border: 1px solid #1e293b !important;
-  padding: 5px 10px !important;
-  border-radius: 5px !important;
-  font-size: 0.78rem !important;
+  background: #0d1520 !important;
+  border: 1px solid #1f2c3f !important;
+  padding: 7px 12px !important;
+  border-radius: 6px !important;
+  font-size: 0.86rem !important;
   flex: 0 0 auto !important;
 }
 
 .wmw-gauge-label {
-  font-size: 0.70rem !important;
+  font-size: 0.78rem !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
-  color: #94a3b8 !important;
+  letter-spacing: 0.05em !important;
+  color: #cbd5e1 !important;
   margin: 0 !important;
 }
 
 .wmw-gauge-val {
   font-weight: 700 !important;
-  color: #ffffff !important;
+  color: #f8fafc !important;
   white-space: nowrap !important;
   margin: 0 !important;
+  font-size: 0.88rem !important;
 }
 
 .wmw-gauge-sub {
-  font-size: 0.68rem !important;
-  font-weight: 400 !important;
-  color: #64748b !important;
+  font-size: 0.80rem !important;
+  font-weight: 500 !important;
+  color: #cbd5e1 !important;
 }
 
 /* ==========================================================================

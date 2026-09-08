@@ -83,33 +83,33 @@ wmw_calc_woodstove_index <- function(today_high) {
   if (is.null(today_high) || is.na(today_high)) today_high <- 70
 
   if (today_high >= 78) {
-    list(level = "Level 1", title = "Screen Doors & Porches", desc = "Windows open · No stove", color = "#f59e0b")
+    list(level = "Level 1", title = "Screen Doors & Porches", desc = "Windows open · No stove", color = "#fbbf24")
   } else if (today_high >= 65) {
-    list(level = "Level 2", title = "Light Flannel", desc = "Windows cracked · Morning chill", color = "#10b981")
+    list(level = "Level 2", title = "Light Flannel", desc = "Windows cracked · Morning chill", color = "#34d399")
   } else if (today_high >= 50) {
     list(level = "Level 3", title = "Evening Stove Draft", desc = "Take the chill off the cabin", color = "#38bdf8")
   } else if (today_high >= 32) {
-    list(level = "Level 4", title = "Daily Stoking", desc = "Steady hardwood burn · Wool socks", color = "#a78bfa")
+    list(level = "Level 4", title = "Daily Stoking", desc = "Steady hardwood burn · Wool socks", color = "#c084fc")
   } else if (today_high >= 15) {
-    list(level = "Level 5", title = "Deep Firebox", desc = "24/7 draft · Keep kettle boiling", color = "#f43f5e")
+    list(level = "Level 5", title = "Deep Firebox", desc = "24/7 draft · Keep kettle boiling", color = "#f87171")
   } else {
-    list(level = "Level 6", title = "Polar Vortex", desc = "Full draft · Check the woodpile", color = "#e11d48")
+    list(level = "Level 6", title = "Polar Vortex", desc = "Full draft · Check the woodpile", color = "#fb7185")
   }
 }
 
 #' Lake Breeze & Surf State
 wmw_calc_lake_breeze <- function(wind_dir, wind_speed) {
   if (is.null(wind_dir) || is.na(wind_dir) || nchar(wind_dir) == 0) {
-    return(list(state = "Calm / Variable", color = "#10b981", desc = "Glassy shore"))
+    return(list(state = "Calm / Variable", color = "#34d399", desc = "Glassy shore"))
   }
 
   dir_upper <- toupper(wind_dir)
   if (grepl("E|NE|SE", dir_upper)) {
     list(state = "Onshore Lake Breeze", color = "#38bdf8", desc = "Choppy surf · Cooler in city")
   } else if (grepl("S|SW|W", dir_upper)) {
-    list(state = "Offshore Breeze", color = "#10b981", desc = "Calm near shore · Beach warmth")
+    list(state = "Offshore Breeze", color = "#34d399", desc = "Calm near shore · Beach warmth")
   } else {
-    list(state = "Northerly Wind", color = "#94a3b8", desc = "Lake rollers · Canadian air")
+    list(state = "Northerly Wind", color = "#cbd5e1", desc = "Lake rollers · Canadian air")
   }
 }
 
@@ -186,38 +186,41 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date()) 
   first_wind_speed <- if (nrow(forecast_df) > 0) forecast_df$wind_speed[1] else "10 mph"
   surf <- wmw_calc_lake_breeze(first_wind_dir, first_wind_speed)
 
-  daylight_color <- if (daylight$is_decreasing) "#f87171" else "#34d399"
+  daylight_color <- if (daylight$is_decreasing) "#fca5a5" else "#86efac"
+
+  update_time <- lubridate::with_tz(Sys.time(), "America/Detroit")
+  update_str <- trimws(gsub("  ", " ", format(update_time, "%a, %b %e · %l:%M %p %Z")))
 
   html <- paste0(
 "<div class='wmw-outpost-card'>
   <div class='wmw-op-header'>
     <span class='wmw-op-title'>Big Lake & Woodstove</span>
-    <span class='wmw-op-badge' style='border-color: rgba(16, 185, 129, 0.35); color: #10b981;'>Gitche Gumee</span>
+    <span class='wmw-op-badge' style='border-color: rgba(56, 189, 248, 0.45); color: #38bdf8;'>Lake Superior</span>
   </div>
   <div class='wmw-op-body'>
     <div class='wmw-gauge-list'>
       <div class='wmw-gauge-item'>
         <span class='wmw-gauge-label'>Lake Superior Water</span>
-        <span class='wmw-gauge-val' style='color: #38bdf8;'>", lake$harbor, "°F <span class='wmw-gauge-sub'>(Harbor)</span> · ", lake$open, "°F <span class='wmw-gauge-sub'>(Open)</span></span>
+        <span class='wmw-gauge-val'><strong style='color: #38bdf8;'>", lake$harbor, "°F</strong> <span class='wmw-gauge-sub'>Harbor</span> &nbsp;·&nbsp; <strong style='color: #7dd3fc;'>", lake$open, "°F</strong> <span class='wmw-gauge-sub'>Open Lake</span></span>
       </div>
       <div class='wmw-gauge-item'>
         <span class='wmw-gauge-label'>Lake Breeze / Surf</span>
-        <span class='wmw-gauge-val' style='color: ", surf$color, ";'>", surf$state, " <span class='wmw-gauge-sub'>(", surf$desc, ")</span></span>
+        <span class='wmw-gauge-val'><strong style='color: ", surf$color, ";'>", surf$state, "</strong> <span class='wmw-gauge-sub'>— ", surf$desc, "</span></span>
       </div>
       <div class='wmw-gauge-item'>
         <span class='wmw-gauge-label'>Flannel & Stove Index</span>
-        <span class='wmw-gauge-val' style='color: ", stove$color, ";'>", stove$level, " · ", stove$title, " <span class='wmw-gauge-sub'>(", stove$desc, ")</span></span>
+        <span class='wmw-gauge-val'><strong style='color: ", stove$color, ";'>", stove$level, ": ", stove$title, "</strong> <span class='wmw-gauge-sub'>— ", stove$desc, "</span></span>
       </div>
       <div class='wmw-gauge-item'>
         <span class='wmw-gauge-label'>Daylight Arc</span>
-        <span class='wmw-gauge-val' style='color: #ffffff;'>", daylight$length_str, " <span style='font-size: 0.72rem; color: ", daylight_color, ";'>(", daylight$change_str, ")</span></span>
+        <span class='wmw-gauge-val'><strong style='color: #ffffff;'>", daylight$length_str, "</strong> <span class='wmw-gauge-sub' style='color: ", daylight_color, "; font-weight: 600;'>&nbsp;(", daylight$change_str, ")</span></span>
       </div>
     </div>
   </div>
   <div class='wmw-op-footer'>
-    <div class='wmw-stat-pill'>Location: <strong>Marquette 46.54°N</strong></div>
-    <div class='wmw-stat-pill'>Lake Elevation: <strong>602 ft</strong></div>
-    <div class='wmw-stat-pill'>Fall Equinox: <strong>Sep 22</strong></div>
+    <div class='wmw-stat-pill'>Last Updated: <strong>", update_str, "</strong></div>
+    <div class='wmw-stat-pill'>Marquette: <strong>46.54°N</strong></div>
+    <div class='wmw-stat-pill'>Lake Elev: <strong>602 ft</strong></div>
   </div>
 </div>")
 
