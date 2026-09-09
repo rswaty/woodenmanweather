@@ -41,9 +41,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-5d21a3e6bccbc8835b9a467d890131af.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-dark-5d21a3e6bccbc8835b9a467d890131af.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-5d21a3e6bccbc8835b9a467d890131af.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-eea8b32af4243ea92850be2c8d1a1f68.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark-eea8b32af4243ea92850be2c8d1a1f68.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-eea8b32af4243ea92850be2c8d1a1f68.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="dark">
 <script src="site_libs/quarto-dashboard/quarto-dashboard.js"></script>
 <script src="site_libs/quarto-dashboard/stickythead.js"></script>
 
@@ -263,7 +263,7 @@ grid-auto-rows: minmax(0, 1fr);">
     </div>
   </div>
   <div class="wmw-op-footer html-fill-item html-fill-container">
-    <div class="wmw-stat-pill html-fill-item html-fill-container">Last Updated: <strong>Wed, Sep 9 · 8:58 AM EDT</strong></div>
+    <div class="wmw-stat-pill html-fill-item html-fill-container">Last Updated: <strong>Wed, Sep 9 · 9:09 AM EDT</strong></div>
     <div class="wmw-stat-pill html-fill-item html-fill-container">Station: <strong>Marquette 46.54°N</strong></div>
   </div>
 </div>
@@ -306,7 +306,7 @@ grid-auto-rows: minmax(0, 1fr);">
 <!-- Horizontal Scrolling Timeline -->
 <div class="wmw-viewport-shell html-fill-item html-fill-container">
 <div class="wmw-viewport html-fill-item html-fill-container" id="wmw-chart-temperature-viewport" tabindex="0">
-<div class="wmw-canvas-wrap html-fill-item html-fill-container" id="wmw-chart-temperature-canvas" style="width: 135%; min-width: 540px;">
+<div class="wmw-canvas-wrap html-fill-item html-fill-container" id="wmw-chart-temperature-canvas">
 <svg class="wmw-svg" viewbox="0 0 900 230" preserveaspectratio="xMinYMid meet">
 <defs>
 <lineargradient id="grad-line-temperature" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -420,39 +420,55 @@ grid-auto-rows: minmax(0, 1fr);">
   const canvas = document.getElementById(chartId + '-canvas');
   const card = document.getElementById(chartId);
   const yPane = card ? card.querySelector('.wmw-y-axis-pane') : null;
+  const ASPECT = 900 / 230;
 
   if (!viewport || !canvas) return;
 
   let userHasInteracted = false;
+  let zoomFactor = 1.35; // Now
 
-  function syncYAxisHeight() {
+  function syncYAxisHeight(h) {
     if (!yPane) return;
-    const h = canvas.getBoundingClientRect().height;
-    if (h > 0) {
-      yPane.style.height = h + 'px';
+    const height = h || canvas.getBoundingClientRect().height;
+    if (height > 0) {
+      yPane.style.height = height + 'px';
     }
+  }
+
+  function layoutCanvas() {
+    const h = Math.max(viewport.clientHeight, 120);
+    const naturalW = h * ASPECT;
+    const w = Math.max(naturalW * zoomFactor, viewport.clientWidth * zoomFactor);
+    canvas.style.height = h + 'px';
+    canvas.style.width = Math.round(w) + 'px';
+    canvas.style.aspectRatio = 'auto';
+    syncYAxisHeight(h);
   }
 
   function scrollToEnd() {
     if (userHasInteracted) return;
     requestAnimationFrame(() => {
+      layoutCanvas();
       viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-      syncYAxisHeight();
     });
   }
 
-  // Scroll to current month on load
+  // Initial layout + scroll to current month
+  layoutCanvas();
   scrollToEnd();
   setTimeout(scrollToEnd, 50);
   setTimeout(scrollToEnd, 200);
-  setTimeout(syncYAxisHeight, 300);
+  setTimeout(layoutCanvas, 300);
 
   if (window.ResizeObserver) {
     new ResizeObserver(() => {
-      syncYAxisHeight();
-      if (!userHasInteracted) scrollToEnd();
+      layoutCanvas();
+      if (!userHasInteracted) {
+        requestAnimationFrame(() => {
+          viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+        });
+      }
     }).observe(viewport);
-    new ResizeObserver(syncYAxisHeight).observe(canvas);
   }
 
   // Translate vertical wheel to horizontal scroll inside viewport
@@ -464,7 +480,7 @@ grid-auto-rows: minmax(0, 1fr);">
     }
   }, { passive: false });
 
-  // Zoom buttons
+  // Zoom buttons — change horizontal density; height always fills the box
   const zoomBtns = card.querySelectorAll('.wmw-pill-btn');
   zoomBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -473,20 +489,20 @@ grid-auto-rows: minmax(0, 1fr);">
       const action = btn.dataset.action;
       if (action === 'zoom-now') {
         userHasInteracted = false;
-        canvas.style.width = '135%';
+        zoomFactor = 1.35;
         scrollToEnd();
       } else if (action === 'zoom-6m') {
         userHasInteracted = true;
-        canvas.style.width = '115%';
+        zoomFactor = 1.15;
+        layoutCanvas();
         requestAnimationFrame(() => {
           viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-          syncYAxisHeight();
         });
       } else if (action === 'zoom-12m') {
         userHasInteracted = true;
-        canvas.style.width = '100%';
+        zoomFactor = 1.0;
+        layoutCanvas();
         viewport.scrollLeft = 0;
-        requestAnimationFrame(syncYAxisHeight);
       }
     });
   });
@@ -554,7 +570,7 @@ grid-auto-rows: minmax(0, 1fr);">
 <!-- Horizontal Scrolling Timeline -->
 <div class="wmw-viewport-shell html-fill-item html-fill-container">
 <div class="wmw-viewport html-fill-item html-fill-container" id="wmw-chart-precipitation-viewport" tabindex="0">
-<div class="wmw-canvas-wrap html-fill-item html-fill-container" id="wmw-chart-precipitation-canvas" style="width: 135%; min-width: 540px;">
+<div class="wmw-canvas-wrap html-fill-item html-fill-container" id="wmw-chart-precipitation-canvas">
 <svg class="wmw-svg" viewbox="0 0 900 230" preserveaspectratio="xMinYMid meet">
 <defs>
 <lineargradient id="grad-line-precipitation" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -668,39 +684,55 @@ grid-auto-rows: minmax(0, 1fr);">
   const canvas = document.getElementById(chartId + '-canvas');
   const card = document.getElementById(chartId);
   const yPane = card ? card.querySelector('.wmw-y-axis-pane') : null;
+  const ASPECT = 900 / 230;
 
   if (!viewport || !canvas) return;
 
   let userHasInteracted = false;
+  let zoomFactor = 1.35; // Now
 
-  function syncYAxisHeight() {
+  function syncYAxisHeight(h) {
     if (!yPane) return;
-    const h = canvas.getBoundingClientRect().height;
-    if (h > 0) {
-      yPane.style.height = h + 'px';
+    const height = h || canvas.getBoundingClientRect().height;
+    if (height > 0) {
+      yPane.style.height = height + 'px';
     }
+  }
+
+  function layoutCanvas() {
+    const h = Math.max(viewport.clientHeight, 120);
+    const naturalW = h * ASPECT;
+    const w = Math.max(naturalW * zoomFactor, viewport.clientWidth * zoomFactor);
+    canvas.style.height = h + 'px';
+    canvas.style.width = Math.round(w) + 'px';
+    canvas.style.aspectRatio = 'auto';
+    syncYAxisHeight(h);
   }
 
   function scrollToEnd() {
     if (userHasInteracted) return;
     requestAnimationFrame(() => {
+      layoutCanvas();
       viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-      syncYAxisHeight();
     });
   }
 
-  // Scroll to current month on load
+  // Initial layout + scroll to current month
+  layoutCanvas();
   scrollToEnd();
   setTimeout(scrollToEnd, 50);
   setTimeout(scrollToEnd, 200);
-  setTimeout(syncYAxisHeight, 300);
+  setTimeout(layoutCanvas, 300);
 
   if (window.ResizeObserver) {
     new ResizeObserver(() => {
-      syncYAxisHeight();
-      if (!userHasInteracted) scrollToEnd();
+      layoutCanvas();
+      if (!userHasInteracted) {
+        requestAnimationFrame(() => {
+          viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+        });
+      }
     }).observe(viewport);
-    new ResizeObserver(syncYAxisHeight).observe(canvas);
   }
 
   // Translate vertical wheel to horizontal scroll inside viewport
@@ -712,7 +744,7 @@ grid-auto-rows: minmax(0, 1fr);">
     }
   }, { passive: false });
 
-  // Zoom buttons
+  // Zoom buttons — change horizontal density; height always fills the box
   const zoomBtns = card.querySelectorAll('.wmw-pill-btn');
   zoomBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -721,20 +753,20 @@ grid-auto-rows: minmax(0, 1fr);">
       const action = btn.dataset.action;
       if (action === 'zoom-now') {
         userHasInteracted = false;
-        canvas.style.width = '135%';
+        zoomFactor = 1.35;
         scrollToEnd();
       } else if (action === 'zoom-6m') {
         userHasInteracted = true;
-        canvas.style.width = '115%';
+        zoomFactor = 1.15;
+        layoutCanvas();
         requestAnimationFrame(() => {
           viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-          syncYAxisHeight();
         });
       } else if (action === 'zoom-12m') {
         userHasInteracted = true;
-        canvas.style.width = '100%';
+        zoomFactor = 1.0;
+        layoutCanvas();
         viewport.scrollLeft = 0;
-        requestAnimationFrame(syncYAxisHeight);
       }
     });
   });
@@ -802,7 +834,7 @@ grid-auto-rows: minmax(0, 1fr);">
 <!-- Horizontal Scrolling Timeline -->
 <div class="wmw-viewport-shell html-fill-item html-fill-container">
 <div class="wmw-viewport html-fill-item html-fill-container" id="wmw-chart-snowfall-viewport" tabindex="0">
-<div class="wmw-canvas-wrap html-fill-item html-fill-container" id="wmw-chart-snowfall-canvas" style="width: 135%; min-width: 540px;">
+<div class="wmw-canvas-wrap html-fill-item html-fill-container" id="wmw-chart-snowfall-canvas">
 <svg class="wmw-svg" viewbox="0 0 900 230" preserveaspectratio="xMinYMid meet">
 <defs>
 <lineargradient id="grad-line-snowfall" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -916,39 +948,55 @@ grid-auto-rows: minmax(0, 1fr);">
   const canvas = document.getElementById(chartId + '-canvas');
   const card = document.getElementById(chartId);
   const yPane = card ? card.querySelector('.wmw-y-axis-pane') : null;
+  const ASPECT = 900 / 230;
 
   if (!viewport || !canvas) return;
 
   let userHasInteracted = false;
+  let zoomFactor = 1.35; // Now
 
-  function syncYAxisHeight() {
+  function syncYAxisHeight(h) {
     if (!yPane) return;
-    const h = canvas.getBoundingClientRect().height;
-    if (h > 0) {
-      yPane.style.height = h + 'px';
+    const height = h || canvas.getBoundingClientRect().height;
+    if (height > 0) {
+      yPane.style.height = height + 'px';
     }
+  }
+
+  function layoutCanvas() {
+    const h = Math.max(viewport.clientHeight, 120);
+    const naturalW = h * ASPECT;
+    const w = Math.max(naturalW * zoomFactor, viewport.clientWidth * zoomFactor);
+    canvas.style.height = h + 'px';
+    canvas.style.width = Math.round(w) + 'px';
+    canvas.style.aspectRatio = 'auto';
+    syncYAxisHeight(h);
   }
 
   function scrollToEnd() {
     if (userHasInteracted) return;
     requestAnimationFrame(() => {
+      layoutCanvas();
       viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-      syncYAxisHeight();
     });
   }
 
-  // Scroll to current month on load
+  // Initial layout + scroll to current month
+  layoutCanvas();
   scrollToEnd();
   setTimeout(scrollToEnd, 50);
   setTimeout(scrollToEnd, 200);
-  setTimeout(syncYAxisHeight, 300);
+  setTimeout(layoutCanvas, 300);
 
   if (window.ResizeObserver) {
     new ResizeObserver(() => {
-      syncYAxisHeight();
-      if (!userHasInteracted) scrollToEnd();
+      layoutCanvas();
+      if (!userHasInteracted) {
+        requestAnimationFrame(() => {
+          viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+        });
+      }
     }).observe(viewport);
-    new ResizeObserver(syncYAxisHeight).observe(canvas);
   }
 
   // Translate vertical wheel to horizontal scroll inside viewport
@@ -960,7 +1008,7 @@ grid-auto-rows: minmax(0, 1fr);">
     }
   }, { passive: false });
 
-  // Zoom buttons
+  // Zoom buttons — change horizontal density; height always fills the box
   const zoomBtns = card.querySelectorAll('.wmw-pill-btn');
   zoomBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -969,20 +1017,20 @@ grid-auto-rows: minmax(0, 1fr);">
       const action = btn.dataset.action;
       if (action === 'zoom-now') {
         userHasInteracted = false;
-        canvas.style.width = '135%';
+        zoomFactor = 1.35;
         scrollToEnd();
       } else if (action === 'zoom-6m') {
         userHasInteracted = true;
-        canvas.style.width = '115%';
+        zoomFactor = 1.15;
+        layoutCanvas();
         requestAnimationFrame(() => {
           viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-          syncYAxisHeight();
         });
       } else if (action === 'zoom-12m') {
         userHasInteracted = true;
-        canvas.style.width = '100%';
+        zoomFactor = 1.0;
+        layoutCanvas();
         viewport.scrollLeft = 0;
-        requestAnimationFrame(syncYAxisHeight);
       }
     });
   });

@@ -487,14 +487,22 @@ p.wmw-human-sub strong,
   color: #e2e8f0;
   border-radius: 10px;
   padding: 10px 14px 6px 12px;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   height: 100% !important;
   min-height: 0 !important;
   box-sizing: border-box;
   font-family: "Nirmala UI", "Nirmala", sans-serif;
   position: relative;
   overflow: hidden;
+}
+
+.wmw-chart-card.html-fill-item,
+.wmw-chart-card.html-fill-container {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
 }
 
 /* Header: Clean title only, 100% width, zero clutter */
@@ -569,7 +577,7 @@ p.wmw-human-sub strong,
 }
 
 /* Chart Main Container (Pinned Y-Axis Pane + Scrollable Timeline)
-   Aspect-locked so SVG text never non-uniformly squashes across screen sizes. */
+   Fills card height; JS sizes canvas from height × 900/230 so text never squashes. */
 .wmw-chart-main {
   display: grid !important;
   grid-template-columns: 58px minmax(0, 1fr) !important;
@@ -577,7 +585,7 @@ p.wmw-human-sub strong,
   flex: 1 1 auto !important;
   position: relative !important;
   min-height: 0 !important;
-  height: auto !important;
+  height: 100% !important;
   margin-top: 4px !important;
   overflow: hidden !important;
   width: 100% !important;
@@ -587,7 +595,7 @@ p.wmw-human-sub strong,
 .wmw-y-axis-pane {
   width: 58px !important;
   max-width: 58px !important;
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
   position: relative !important;
   z-index: 5 !important;
@@ -623,13 +631,15 @@ p.wmw-human-sub strong,
   position: relative !important;
   min-width: 0 !important;
   width: 100% !important;
-  height: auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
   overflow: hidden !important;
 }
 
 .wmw-viewport {
   width: 100% !important;
-  height: auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
   overflow-x: auto !important;
   overflow-y: hidden !important;
   scroll-behavior: smooth;
@@ -660,12 +670,11 @@ p.wmw-human-sub strong,
   cursor: grabbing;
 }
 
-/* Lock canvas to SVG viewBox ratio (900:230) so labels stay normal width */
+/* Height fills the box; width is set in JS from height × (900/230) × zoom */
 .wmw-canvas-wrap {
-  width: 135%;
-  min-width: 540px;
-  aspect-ratio: 900 / 230;
-  height: auto !important;
+  height: 100% !important;
+  width: auto !important;
+  min-width: 0 !important;
   min-height: 0 !important;
   position: relative;
   transition: width 0.25s ease;
