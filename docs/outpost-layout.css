@@ -1,0 +1,187 @@
+/* Outpost card layout harden — Quarto fill classes collapse/overlap these cards.
+   Source of truth also lives in styles/wooden.scss for the next full render. */
+
+.wmw-outpost-card,
+.wmw-outpost-card.html-fill-item,
+.wmw-outpost-card.html-fill-container {
+  justify-content: flex-start !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.wmw-outpost-card .html-fill-item,
+.wmw-outpost-card .html-fill-container {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.wmw-outpost-card > .wmw-op-body.html-fill-item,
+.wmw-outpost-card > .wmw-op-body.html-fill-container {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+}
+
+.wmw-op-header,
+.wmw-op-header.html-fill-item,
+.wmw-op-header.html-fill-container,
+.wmw-op-footer,
+.wmw-op-footer.html-fill-item,
+.wmw-op-footer.html-fill-container {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+.wmw-human-headline,
+.wmw-human-headline.html-fill-item,
+.wmw-human-headline.html-fill-container,
+.wmw-human-sub,
+.wmw-human-sub.html-fill-item,
+.wmw-human-sub.html-fill-container,
+.wmw-earth-bar-shell,
+.wmw-earth-bar-shell.html-fill-item,
+.wmw-earth-bar-shell.html-fill-container {
+  display: block !important;
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: auto !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.wmw-earth-bar-shell,
+.wmw-earth-bar-shell.html-fill-item,
+.wmw-earth-bar-shell.html-fill-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  margin: 6px 0 2px 0 !important;
+  z-index: 1 !important;
+}
+
+.wmw-earth-bar-track,
+.wmw-earth-bar-track.html-fill-item,
+.wmw-earth-bar-track.html-fill-container {
+  display: block !important;
+  position: relative !important;
+  height: 8px !important;
+  min-height: 8px !important;
+  max-height: 8px !important;
+  flex: 0 0 auto !important;
+  margin: 10px 0 6px 0 !important;
+  overflow: visible !important;
+}
+
+.wmw-earth-bar-pin,
+.wmw-earth-bar-pin.html-fill-item,
+.wmw-earth-bar-pin.html-fill-container {
+  display: block !important;
+  position: absolute !important;
+  top: 50% !important;
+  width: 14px !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  max-height: 14px !important;
+  transform: translate(-50%, -50%) !important;
+  flex: none !important;
+  overflow: visible !important;
+  z-index: 2 !important;
+}
+
+.wmw-earth-bar-labels,
+.wmw-earth-bar-labels.html-fill-item,
+.wmw-earth-bar-labels.html-fill-container {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 4px 8px !important;
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+.wmw-earth-bar-labels > span {
+  display: inline-block !important;
+  flex: 0 0 auto !important;
+  height: auto !important;
+  white-space: nowrap !important;
+}
+
+.wmw-op-footer,
+.wmw-op-footer.html-fill-item,
+.wmw-op-footer.html-fill-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  margin-top: auto !important;
+}
+
+.wmw-stat-pill,
+.wmw-stat-pill.html-fill-item,
+.wmw-stat-pill.html-fill-container {
+  flex: 0 1 auto !important;
+  height: auto !important;
+  white-space: nowrap !important;
+}
+
+.wmw-gauge-list,
+.wmw-gauge-list.html-fill-item,
+.wmw-gauge-list.html-fill-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  justify-content: flex-start !important;
+  height: auto !important;
+}
+
+.wmw-gauge-item,
+.wmw-gauge-item.html-fill-item,
+.wmw-gauge-item.html-fill-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 2px !important;
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: auto !important;
+  padding: 6px 10px !important;
+}
+
+.wmw-gauge-label {
+  display: block !important;
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+.wmw-gauge-val {
+  display: block !important;
+  flex: 0 0 auto !important;
+  white-space: normal !important;
+  text-align: left !important;
+  line-height: 1.35 !important;
+  max-width: 100% !important;
+  word-break: break-word !important;
+}
+
+.wmw-gauge-sub {
+  white-space: normal !important;
+}
+
+@media (max-width: 1400px) {
+  .wmw-human-headline,
+  .wmw-human-headline.html-fill-item,
+  .wmw-human-headline.html-fill-container {
+    font-size: 0.98rem !important;
+  }
+}

@@ -4,6 +4,7 @@ subtitle: "Marquette & the central U.P."
 format:
   dashboard:
     orientation: columns
+    css: styles/outpost-layout.css
 execute:
   freeze: false
 ---
@@ -41,7 +42,7 @@ wmw_card_sidebar_dispatch()
 
 ## Column {width=80%}
 
-### Row {height=36%}
+### Row {height=40%}
 
 #### Global Thermometer
 
@@ -55,7 +56,7 @@ wmw_card_human_thermometer(today_high)
 wmw_card_lake_woodstove(today_high, forecast, context = nws_context)
 ```
 
-### Row {height=64%}
+### Row {height=60%}
 
 #### Temperature
 
