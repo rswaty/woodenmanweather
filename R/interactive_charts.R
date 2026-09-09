@@ -32,6 +32,9 @@ wmw_interactive_chart <- function(
   }
 
   secondary_badge_html <- ""
+  chart_subtitle <- ""
+  max_vals <- NULL
+  min_vals <- NULL
 
   # Metric specific divergence palettes & calculations
   if (metric == "temperature") {
@@ -41,18 +44,27 @@ wmw_interactive_chart <- function(
     tick_unit <- "°"
     unit_badge <- "°F"
     digits <- 0
-    title <- "Daily Highs: Today vs. Recent Historical Norms"
+    title <- "Monthly Avg Highs vs. Recent Historical Norms"
+    chart_subtitle <- "Solid line = month average daily high · Diamonds = hottest day of each month"
     pos_color <- "#f59e0b"        # warm amber (above normal)
     neg_color <- "#38bdf8"        # crisp slate-cyan (below normal)
 
     obs_vals <- as.numeric(series[[obs_col]])
     norm_vals <- as.numeric(series[[norm_col]])
+    max_vals <- if ("tmax_max" %in% names(series)) as.numeric(series$tmax_max) else obs_vals
+    min_vals <- if ("tmin_min" %in% names(series)) as.numeric(series$tmin_min) else rep(NA_real_, n_pts)
 
-    # Today's high in the bubble
-    latest_norm <- norm_vals[n_pts] # Sep normal high ~66.3°F
+    # Today's high in the bubble + rightmost mean point
+    latest_norm <- norm_vals[n_pts]
     latest_obs <- if (!is.null(today_high) && !is.na(today_high)) as.numeric(today_high) else obs_vals[n_pts]
-    # Update the rightmost point on the observed curve to reflect today's high
     obs_vals[n_pts] <- latest_obs
+
+    # Current-month hottest day includes today's forecast/obs high when warmer
+    if (!is.na(max_vals[n_pts])) {
+      max_vals[n_pts] <- max(max_vals[n_pts], latest_obs, na.rm = TRUE)
+    } else {
+      max_vals[n_pts] <- latest_obs
+    }
 
     latest_diff <- latest_obs - latest_norm
     diff_rounded <- round(latest_diff, 0)
@@ -71,6 +83,19 @@ wmw_interactive_chart <- function(
         "<div class='wmw-stat-badge'>",
         "<span class='wmw-stat-now-label'>Today's Low:</span>",
         "<span class='wmw-stat-now-value'>", low_str, "</span>",
+        "</div>"
+      )
+    }
+
+    # Show the latest month's hottest observed day (builds trust vs the average line)
+    latest_max <- max_vals[n_pts]
+    if (!is.na(latest_max)) {
+      max_lbl <- paste0(series$month_label[n_pts], " max high:")
+      secondary_badge_html <- paste0(
+        secondary_badge_html,
+        "<div class='wmw-stat-badge'>",
+        "<span class='wmw-stat-now-label'>", max_lbl, "</span>",
+        "<span class='wmw-stat-now-value'>", round(latest_max, 0), " °F</span>",
         "</div>"
       )
     }
@@ -162,8 +187,8 @@ wmw_interactive_chart <- function(
   pad_bottom <- 36
   plot_h <- view_h - pad_top - pad_bottom
 
-  # Y range calculation
-  all_vals <- c(obs_vals, norm_vals)
+  # Y range calculation — include monthly extremes on temperature
+  all_vals <- c(obs_vals, norm_vals, max_vals, min_vals)
   all_vals <- all_vals[!is.na(all_vals)]
   val_min <- min(all_vals)
   val_max <- max(all_vals)
@@ -207,7 +232,7 @@ wmw_interactive_chart <- function(
   y_axis_ticks_str <- paste(y_axis_ticks_svg, collapse = "\n")
 
   fixed_y_axis_html <- paste0(
-"<svg class='wmw-y-axis-svg' viewBox='0 0 58 ", view_h, "' preserveAspectRatio='xMaxYMid meet'>
+"<svg class='wmw-y-axis-svg' viewBox='0 0 58 ", view_h, "' preserveAspectRatio='none'>
 <text x='52' y='13' class='wmw-y-axis-unit' text-anchor='end'>", unit_badge, "</text>
 <line x1='57' y1='", pad_top - 4, "' x2='57' y2='", baseline_y, "' stroke='#475569' stroke-width='1.5' />
 ", y_axis_ticks_str, "
@@ -299,9 +324,9 @@ wmw_interactive_chart <- function(
   curr_y <- round(y_obs[n_pts], 1)
   curr_dot_color <- if (obs_vals[n_pts] >= norm_vals[n_pts]) pos_color else neg_color
 
-  # Build timeline SVG content
+  # Build timeline SVG content — fill the box the same in card and expand
   timeline_svg_html <- paste0(
-"<svg class='wmw-svg' viewBox='0 0 ", view_w_timeline, " ", view_h, "' preserveAspectRatio='xMinYMid meet'>
+"<svg class='wmw-svg' viewBox='0 0 ", view_w_timeline, " ", view_h, "' preserveAspectRatio='none'>
 <defs>
 <linearGradient id='", grad_line_id, "' x1='0%' y1='0%' x2='100%' y2='0%'>
 ", grad_line_str, "
@@ -318,15 +343,15 @@ wmw_interactive_chart <- function(
 <!-- Historical line: crisp white and slightly wider (stroke-width 2.6) -->
 <path d='", norm_path, "' stroke='#ffffff' stroke-width='2.6' stroke-dasharray='6 4' opacity='0.95' fill='none' class='wmw-normal-line' />
 
-<!-- Observed line: color changes smoothly with divergence -->
+<!-- Observed monthly-average line -->
 <path d='", obs_path, "' stroke='url(#", grad_line_id, ")' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round' fill='none' class='wmw-obs-line' />
 
 <!-- X-Axis baseline and month tick marks -->
 <line x1='0' y1='", baseline_y, "' x2='", view_w_timeline, "' y2='", baseline_y, "' stroke='#334155' stroke-width='1.5' />
 ", month_labels_svg_str, "
 
-<!-- Historical data points -->
-<g class='wmw-markers-group'>");
+<!-- Mean-high markers -->
+<g class='wmw-markers-group'>")
 
   for (i in seq_len(n_pts)) {
     is_latest <- (i == n_pts)
@@ -337,33 +362,56 @@ wmw_interactive_chart <- function(
     }
   }
 
-  # Clean static point on latest observation (zero motion/animation)
+  # Monthly hottest-day diamonds (temperature only)
+  if (!is.null(max_vals)) {
+    timeline_svg_html <- paste0(timeline_svg_html, "
+</g>
+<g class='wmw-max-group'>")
+    for (i in seq_len(n_pts)) {
+      if (is.na(max_vals[i]) || is.na(obs_vals[i])) next
+      if (max_vals[i] <= obs_vals[i] + 0.5) next
+      mx <- round(x_coords[i], 1)
+      my_mean <- round(y_obs[i], 1)
+      my_max <- round(y_scale(max_vals[i]), 1)
+      timeline_svg_html <- paste0(timeline_svg_html, "
+<line x1='", mx, "' y1='", my_mean, "' x2='", mx, "' y2='", my_max, "' stroke='#f59e0b' stroke-width='1.2' stroke-opacity='0.45' />
+<polygon points='", mx, ",", my_max - 4.5, " ", mx + 4.5, ",", my_max, " ", mx, ",", my_max + 4.5, " ", mx - 4.5, ",", my_max, "' fill='#f59e0b' stroke='#090d13' stroke-width='1' class='wmw-max-dot' />")
+    }
+    timeline_svg_html <- paste0(timeline_svg_html, "
+</g>
+<g class='wmw-markers-group'>")
+  }
+
   timeline_svg_html <- paste0(timeline_svg_html, "
 <circle cx='", curr_x, "' cy='", curr_y, "' r='5.5' fill='", curr_dot_color, "' stroke='#ffffff' stroke-width='2' class='wmw-dot-current' />
 </g>
 </svg>")
 
+  subtitle_html <- if (nzchar(chart_subtitle)) {
+    paste0("<div class='wmw-chart-subtitle'>", chart_subtitle, "</div>")
+  } else {
+    ""
+  }
+
   html <- paste0(
 "<div class='wmw-chart-card' id='", chart_id, "' data-metric='", metric, "'>
 <div class='wmw-chart-header'>
 <h4 class='wmw-chart-title'>", title, "</h4>
+", subtitle_html, "
 </div>
 <div class='wmw-chart-main'>
-<!-- Pinned Y-Axis Pane (Always 100% visible, never scrolls away!) -->
 <div class='wmw-y-axis-pane'>
 ", fixed_y_axis_html, "
 </div>
-<!-- Horizontal Scrolling Timeline -->
 <div class='wmw-viewport-shell'>
 <div class='wmw-viewport' id='", chart_id, "-viewport' tabindex='0'>
-<div class='wmw-canvas-wrap' id='", chart_id, "-canvas'>
+<div class='wmw-canvas-wrap' id='", chart_id, "-canvas' style='width: 135%; min-width: 540px;'>
 ", timeline_svg_html, "
 </div>
 </div>
 </div>
 </div>
 
-<!-- Clean Status & Controls Bar BELOW the chart -->
 <div class='wmw-chart-bottom-bar'>
 <div class='wmw-bottom-stats'>
 <div class='wmw-stat-badge'>
@@ -385,59 +433,26 @@ wmw_interactive_chart <- function(
   const viewport = document.getElementById(chartId + '-viewport');
   const canvas = document.getElementById(chartId + '-canvas');
   const card = document.getElementById(chartId);
-  const yPane = card ? card.querySelector('.wmw-y-axis-pane') : null;
-  const ASPECT = 900 / 230;
 
   if (!viewport || !canvas) return;
 
   let userHasInteracted = false;
-  let zoomFactor = 1.35; // Now
-
-  function syncYAxisHeight(h) {
-    if (!yPane) return;
-    const height = h || canvas.getBoundingClientRect().height;
-    if (height > 0) {
-      yPane.style.height = height + 'px';
-    }
-  }
-
-  function layoutCanvas() {
-    const h = Math.max(viewport.clientHeight, 120);
-    const naturalW = h * ASPECT;
-    const w = Math.max(naturalW * zoomFactor, viewport.clientWidth * zoomFactor);
-    canvas.style.height = h + 'px';
-    canvas.style.width = Math.round(w) + 'px';
-    canvas.style.aspectRatio = 'auto';
-    syncYAxisHeight(h);
-  }
 
   function scrollToEnd() {
     if (userHasInteracted) return;
     requestAnimationFrame(() => {
-      layoutCanvas();
       viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
     });
   }
 
-  // Initial layout + scroll to current month
-  layoutCanvas();
   scrollToEnd();
   setTimeout(scrollToEnd, 50);
   setTimeout(scrollToEnd, 200);
-  setTimeout(layoutCanvas, 300);
 
   if (window.ResizeObserver) {
-    new ResizeObserver(() => {
-      layoutCanvas();
-      if (!userHasInteracted) {
-        requestAnimationFrame(() => {
-          viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-        });
-      }
-    }).observe(viewport);
+    new ResizeObserver(() => { if (!userHasInteracted) scrollToEnd(); }).observe(viewport);
   }
 
-  // Translate vertical wheel to horizontal scroll inside viewport
   viewport.addEventListener('wheel', (e) => {
     userHasInteracted = true;
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
@@ -446,7 +461,6 @@ wmw_interactive_chart <- function(
     }
   }, { passive: false });
 
-  // Zoom buttons — change horizontal density; height always fills the box
   const zoomBtns = card.querySelectorAll('.wmw-pill-btn');
   zoomBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -455,25 +469,22 @@ wmw_interactive_chart <- function(
       const action = btn.dataset.action;
       if (action === 'zoom-now') {
         userHasInteracted = false;
-        zoomFactor = 1.35;
+        canvas.style.width = '135%';
         scrollToEnd();
       } else if (action === 'zoom-6m') {
         userHasInteracted = true;
-        zoomFactor = 1.15;
-        layoutCanvas();
+        canvas.style.width = '115%';
         requestAnimationFrame(() => {
           viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
         });
       } else if (action === 'zoom-12m') {
         userHasInteracted = true;
-        zoomFactor = 1.0;
-        layoutCanvas();
+        canvas.style.width = '100%';
         viewport.scrollLeft = 0;
       }
     });
   });
 
-  // Mouse Drag to Pan horizontally
   let isDown = false;
   let startX = 0;
   let scrollLeft = 0;
@@ -501,6 +512,7 @@ wmw_interactive_chart <- function(
 })();
 </script>
 </div>")
+
 
   htmltools::HTML(html)
 }

@@ -530,6 +530,16 @@ p.wmw-human-sub strong,
   text-align: left !important;
 }
 
+.wmw-chart-subtitle {
+  display: block !important;
+  font-size: 0.72rem !important;
+  font-weight: 500 !important;
+  color: #94a3b8 !important;
+  margin: 4px 0 0 0 !important;
+  padding: 0 !important;
+  line-height: 1.35 !important;
+}
+
 /* Nav & Zoom Tools (Clean horizontal pill group pinned to the right) */
 .wmw-nav-tools,
 .wmw-nav-tools.html-fill-item,
@@ -576,8 +586,7 @@ p.wmw-human-sub strong,
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
 }
 
-/* Chart Main Container (Pinned Y-Axis Pane + Scrollable Timeline)
-   Fills card height; JS sizes canvas from height × 900/230 so text never squashes. */
+/* Chart Main Container — simple fill; same rules in card and expand */
 .wmw-chart-main {
   display: grid !important;
   grid-template-columns: 58px minmax(0, 1fr) !important;
@@ -591,7 +600,7 @@ p.wmw-human-sub strong,
   width: 100% !important;
 }
 
-/* Pinned Y-Axis Pane (Always 100% visible, never scrolls away!) */
+/* Pinned Y-Axis Pane */
 .wmw-y-axis-pane {
   width: 58px !important;
   max-width: 58px !important;
@@ -608,7 +617,6 @@ p.wmw-human-sub strong,
   width: 100% !important;
   height: 100% !important;
   display: block !important;
-  overflow: visible !important;
 }
 
 .wmw-y-axis-unit {
@@ -670,11 +678,11 @@ p.wmw-human-sub strong,
   cursor: grabbing;
 }
 
-/* Height fills the box; width is set in JS from height × (900/230) × zoom */
+/* Width via zoom %; height fills the card/expand box */
 .wmw-canvas-wrap {
   height: 100% !important;
-  width: auto !important;
-  min-width: 0 !important;
+  width: 135%;
+  min-width: 540px;
   min-height: 0 !important;
   position: relative;
   transition: width 0.25s ease;
@@ -684,7 +692,6 @@ p.wmw-human-sub strong,
   width: 100% !important;
   height: 100% !important;
   display: block !important;
-  overflow: visible !important;
 }
 
 /* SVG Elements & Styling */

@@ -72,6 +72,22 @@ wmw_monthly_summary <- function(daily) {
     FUN = function(x) mean(x, na.rm = TRUE),
     na.action = na.pass
   )
+  tmax_max <- stats::aggregate(
+    tmax_f ~ year + month,
+    data = daily,
+    FUN = function(x) max(x, na.rm = TRUE),
+    na.action = na.pass
+  )
+  names(tmax_max)[names(tmax_max) == "tmax_f"] <- "tmax_max"
+
+  tmin_min <- stats::aggregate(
+    tmin_f ~ year + month,
+    data = daily,
+    FUN = function(x) min(x, na.rm = TRUE),
+    na.action = na.pass
+  )
+  names(tmin_min)[names(tmin_min) == "tmin_f"] <- "tmin_min"
+
   tavg <- stats::aggregate(
     tavg_f ~ year + month,
     data = daily,
@@ -91,7 +107,9 @@ wmw_monthly_summary <- function(daily) {
     na.action = na.pass
   )
 
-  monthly <- merge(tmax, tavg, by = c("year", "month"))
+  monthly <- merge(tmax, tmax_max, by = c("year", "month"))
+  monthly <- merge(monthly, tmin_min, by = c("year", "month"))
+  monthly <- merge(monthly, tavg, by = c("year", "month"))
   monthly <- merge(monthly, prcp, by = c("year", "month"))
   monthly <- merge(monthly, snow, by = c("year", "month"))
   monthly
