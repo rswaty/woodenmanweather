@@ -47,10 +47,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-33491bbd0b53ad59263d0c8abbcb82ad.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-dark-33491bbd0b53ad59263d0c8abbcb82ad.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-33491bbd0b53ad59263d0c8abbcb82ad.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="dark">
-<link href="outpost-layout.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-504b4d6068b89b890a13e1bfe397649c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark-504b4d6068b89b890a13e1bfe397649c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-504b4d6068b89b890a13e1bfe397649c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="dark">
 <script src="site_libs/quarto-dashboard/quarto-dashboard.js"></script>
 <script src="site_libs/quarto-dashboard/stickythead.js"></script>
 
@@ -88,6 +87,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
+<link rel="stylesheet" href="styles/outpost-layout.css">
 </head>
 
 <body class="quarto-dashboard nav-fixed dashboard-fill fullcontent quarto-light">
@@ -213,12 +213,12 @@ grid-auto-rows: minmax(0, 1fr);">
     <span class="wmw-op-title">Global Human Thermometer</span>
   </div>
   <div class="wmw-op-body html-fill-item html-fill-container">
-    <div class="wmw-human-headline html-fill-item html-fill-container">Today's high in Marquette of <span class="wmw-hl-warm">78°F</span> puts you warmer than <span class="wmw-hl-warm">70% of humanity</span>.</div>
-    <div class="wmw-human-sub html-fill-item html-fill-container">Out of 8.2 billion people on Earth today, approximately <strong>5.7 billion</strong> have a cooler daytime high.</div>
+    <div class="wmw-human-headline html-fill-item html-fill-container">Today's high in Marquette of <span class="wmw-hl-cold">69°F</span> leaves you colder than <span class="wmw-hl-cold">60% of humanity</span>.</div>
+    <div class="wmw-human-sub html-fill-item html-fill-container">Out of 8.2 billion people on Earth today, approximately <strong>4.9 billion</strong> have a warmer daytime high.</div>
     
     <div class="wmw-earth-bar-shell html-fill-item html-fill-container">
       <div class="wmw-earth-bar-track html-fill-item html-fill-container">
-        <div class="wmw-earth-bar-pin html-fill-item html-fill-container" style="left: 70%; border-color: #f59e0b;"></div>
+        <div class="wmw-earth-bar-pin html-fill-item html-fill-container" style="left: 40%; border-color: #38bdf8;"></div>
       </div>
       <div class="wmw-earth-bar-labels html-fill-item html-fill-container">
         <span>Colder (0%)</span>
@@ -228,7 +228,7 @@ grid-auto-rows: minmax(0, 1fr);">
     </div>
   </div>
   <div class="wmw-op-footer html-fill-item html-fill-container">
-    <div class="wmw-stat-pill html-fill-item html-fill-container">Marquette High: <strong>78°F</strong></div>
+    <div class="wmw-stat-pill html-fill-item html-fill-container">Marquette High: <strong>69°F</strong></div>
     <div class="wmw-stat-pill html-fill-item html-fill-container">Global Median: <strong>72°F</strong></div>
     <div class="wmw-stat-pill html-fill-item html-fill-container">Coldest: <strong>-62°F (Vostok)</strong></div>
     <div class="wmw-stat-pill html-fill-item html-fill-container">Warmest: <strong>114°F (Kuwait)</strong></div>
@@ -262,7 +262,7 @@ grid-auto-rows: minmax(0, 1fr);">
       </div>
       <div class="wmw-gauge-item html-fill-item html-fill-container">
         <span class="wmw-gauge-label">Flannel &amp; Stove Index</span>
-        <span class="wmw-gauge-val"><strong style="color: #fbbf24;">Level 1: Screen Doors &amp; Porches</strong> <span class="wmw-gauge-sub">— Windows open · No stove</span></span>
+        <span class="wmw-gauge-val"><strong style="color: #34d399;">Level 2: Light Flannel</strong> <span class="wmw-gauge-sub">— Windows cracked · Morning chill</span></span>
       </div>
       <div class="wmw-gauge-item html-fill-item html-fill-container">
         <span class="wmw-gauge-label">Daylight Arc</span>
@@ -271,7 +271,7 @@ grid-auto-rows: minmax(0, 1fr);">
     </div>
   </div>
   <div class="wmw-op-footer html-fill-item html-fill-container">
-    <div class="wmw-stat-pill html-fill-item html-fill-container">Last Updated: <strong>Wed, Sep 9 · 11:06 AM EDT</strong></div>
+    <div class="wmw-stat-pill html-fill-item html-fill-container">Last Updated: <strong>Wed, Sep 9 · 6:50 PM EDT</strong></div>
     <div class="wmw-stat-pill html-fill-item html-fill-container">Station: <strong>Marquette 46.54°N</strong></div>
   </div>
 </div>
@@ -344,13 +344,13 @@ grid-auto-rows: minmax(0, 1fr);">
 <rect x="0" y="0" width="900" height="230" class="wmw-bg-rect"></rect>
 
 <!-- Light shading strictly between current observed and historical lines -->
-<path d="M 20 82.6 C 32.8 86.5, 71.2 99.5, 96.8 106.2 C 122.4 112.9, 148 118.9, 173.6 122.7 C 199.2 126.5, 224.8 130, 250.5 129 C 276.1 128.1, 301.7 120.4, 327.3 117 C 352.9 113.6, 378.5 112.4, 404.1 108.8 C 429.7 105.1, 455.3 99.7, 480.9 94.9 C 506.5 90.2, 532.1 84.9, 557.7 80.1 C 583.3 75.2, 608.9 69.6, 634.5 66 C 660.2 62.4, 685.8 59, 711.4 58.7 C 737 58.4, 762.6 63.7, 788.2 64.2 C 813.8 64.7, 852.2 62.1, 865 61.6 L 865 74.6 L 788.2 65.8 L 711.4 63.9 L 634.5 68.5 L 557.7 79.7 L 480.9 96.5 L 404.1 109.3 L 327.3 120.3 L 250.5 124.1 L 173.6 118.4 L 96.8 106.5 L 20 90.7 Z" fill="url(#grad-area-temperature)" class="wmw-area-divergence"></path>
+<path d="M 20 82.6 C 32.8 86.5, 71.2 99.5, 96.8 106.2 C 122.4 112.9, 148 118.9, 173.6 122.7 C 199.2 126.5, 224.8 130, 250.5 129 C 276.1 128.1, 301.7 120.4, 327.3 117 C 352.9 113.6, 378.5 112.4, 404.1 108.8 C 429.7 105.1, 455.3 99.7, 480.9 94.9 C 506.5 90.2, 532.1 84.9, 557.7 80.1 C 583.3 75.2, 608.9 69.6, 634.5 66 C 660.2 62.4, 685.8 59, 711.4 58.7 C 737 58.4, 762.6 62, 788.2 64.2 C 813.8 66.3, 852.2 70.4, 865 71.6 L 865 74.6 L 788.2 65.8 L 711.4 63.9 L 634.5 68.5 L 557.7 79.7 L 480.9 96.5 L 404.1 109.3 L 327.3 120.3 L 250.5 124.1 L 173.6 118.4 L 96.8 106.5 L 20 90.7 Z" fill="url(#grad-area-temperature)" class="wmw-area-divergence"></path>
 
 <!-- Historical line: crisp white and slightly wider (stroke-width 2.6) -->
 <path d="M 20 90.7 C 32.8 93.3, 71.2 101.9, 96.8 106.5 C 122.4 111.1, 148 115.5, 173.6 118.4 C 199.2 121.4, 224.8 123.8, 250.5 124.1 C 276.1 124.4, 301.7 122.8, 327.3 120.3 C 352.9 117.9, 378.5 113.3, 404.1 109.3 C 429.7 105.3, 455.3 101.4, 480.9 96.5 C 506.5 91.5, 532.1 84.3, 557.7 79.7 C 583.3 75, 608.9 71.1, 634.5 68.5 C 660.2 65.9, 685.8 64.3, 711.4 63.9 C 737 63.4, 762.6 64.1, 788.2 65.8 C 813.8 67.6, 852.2 73.1, 865 74.6" stroke="#ffffff" stroke-width="2.6" stroke-dasharray="6 4" opacity="0.95" fill="none" class="wmw-normal-line"></path>
 
 <!-- Observed monthly-average line -->
-<path d="M 20 82.6 C 32.8 86.5, 71.2 99.5, 96.8 106.2 C 122.4 112.9, 148 118.9, 173.6 122.7 C 199.2 126.5, 224.8 130, 250.5 129 C 276.1 128.1, 301.7 120.4, 327.3 117 C 352.9 113.6, 378.5 112.4, 404.1 108.8 C 429.7 105.1, 455.3 99.7, 480.9 94.9 C 506.5 90.2, 532.1 84.9, 557.7 80.1 C 583.3 75.2, 608.9 69.6, 634.5 66 C 660.2 62.4, 685.8 59, 711.4 58.7 C 737 58.4, 762.6 63.7, 788.2 64.2 C 813.8 64.7, 852.2 62.1, 865 61.6" stroke="url(#grad-line-temperature)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none" class="wmw-obs-line"></path>
+<path d="M 20 82.6 C 32.8 86.5, 71.2 99.5, 96.8 106.2 C 122.4 112.9, 148 118.9, 173.6 122.7 C 199.2 126.5, 224.8 130, 250.5 129 C 276.1 128.1, 301.7 120.4, 327.3 117 C 352.9 113.6, 378.5 112.4, 404.1 108.8 C 429.7 105.1, 455.3 99.7, 480.9 94.9 C 506.5 90.2, 532.1 84.9, 557.7 80.1 C 583.3 75.2, 608.9 69.6, 634.5 66 C 660.2 62.4, 685.8 59, 711.4 58.7 C 737 58.4, 762.6 62, 788.2 64.2 C 813.8 66.3, 852.2 70.4, 865 71.6" stroke="url(#grad-line-temperature)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none" class="wmw-obs-line"></path>
 
 <!-- X-Axis baseline and month tick marks -->
 <line x1="0" y1="198" x2="900" y2="198" stroke="#334155" stroke-width="1.5"></line>
@@ -404,11 +404,11 @@ grid-auto-rows: minmax(0, 1fr);">
 <polygon points="711.4,37.3 715.9,41.8 711.4,46.3 706.9,41.8" fill="#f59e0b" stroke="#090d13" stroke-width="1" class="wmw-max-dot"></polygon>
 <line x1="788.2" y1="64.2" x2="788.2" y2="53.9" stroke="#f59e0b" stroke-width="1.2" stroke-opacity="0.45"></line>
 <polygon points="788.2,49.4 792.7,53.9 788.2,58.4 783.7,53.9" fill="#f59e0b" stroke="#090d13" stroke-width="1" class="wmw-max-dot"></polygon>
-<line x1="865" y1="61.6" x2="865" y2="49.5" stroke="#f59e0b" stroke-width="1.2" stroke-opacity="0.45"></line>
+<line x1="865" y1="71.6" x2="865" y2="49.5" stroke="#f59e0b" stroke-width="1.2" stroke-opacity="0.45"></line>
 <polygon points="865,45 869.5,49.5 865,54 860.5,49.5" fill="#f59e0b" stroke="#090d13" stroke-width="1" class="wmw-max-dot"></polygon>
 </g>
 <g class="wmw-markers-group">
-<circle cx="865" cy="61.6" r="5.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2" class="wmw-dot-current"></circle>
+<circle cx="865" cy="71.6" r="5.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2" class="wmw-dot-current"></circle>
 </g>
 </svg>
 </div>
@@ -435,8 +435,8 @@ grid-auto-rows: minmax(0, 1fr);">
 <div class="wmw-bottom-stats html-fill-item html-fill-container">
 <div class="wmw-stat-badge html-fill-item html-fill-container">
 <span class="wmw-stat-now-label">Today's High:</span>
-<span class="wmw-stat-now-value">78 °F</span>
-<span class="wmw-stat-now-diff" style="color: #f59e0b;">(+12 °F vs. recent normal)</span>
+<span class="wmw-stat-now-value">69 °F</span>
+<span class="wmw-stat-now-diff" style="color: #f59e0b;">(+3 °F vs. recent normal)</span>
 </div>
 <div class="wmw-stat-badge html-fill-item html-fill-container"><span class="wmw-stat-now-label">Today's Low:</span><span class="wmw-stat-now-value">56 °F</span></div><div class="wmw-stat-badge html-fill-item html-fill-container"><span class="wmw-stat-now-label">Sep max high:</span><span class="wmw-stat-now-value">89 °F</span></div>
 </div>
