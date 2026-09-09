@@ -213,30 +213,29 @@ wmw_interactive_chart <- function(
 
   baseline_y <- view_h - pad_bottom + 4
 
-  # Build Fixed Y-Axis SVG (Always visible on left!)
+  # HTML Y-axis (same font path as badges — never SVG-squashed)
   raw_ticks <- pretty(c(if (metric %in% c("precipitation", "snowfall")) 0 else val_min, val_max), n = 4)
   valid_ticks <- raw_ticks[raw_ticks >= y_min & raw_ticks <= y_max]
   if (length(valid_ticks) == 0) valid_ticks <- raw_ticks
 
-  y_axis_ticks_svg <- character(length(valid_ticks))
+  y_labels_html <- character(length(valid_ticks))
   for (j in seq_along(valid_ticks)) {
     tv <- valid_ticks[j]
     ty <- y_scale(tv)
+    top_pct <- round((ty / view_h) * 100, 2)
     lbl_val <- if (digits == 0) round(tv, 0) else format(round(tv, digits), nsmall = digits)
     tick_lbl <- paste0(lbl_val, tick_unit)
-    y_axis_ticks_svg[j] <- paste0(
-      "<line x1='52' y1='", round(ty, 1), "' x2='57' y2='", round(ty, 1), "' stroke='#475569' stroke-width='1.5' />\n",
-      "<text x='48' y='", round(ty + 4, 1), "' class='wmw-y-axis-txt' text-anchor='end'>", tick_lbl, "</text>"
+    y_labels_html[j] <- paste0(
+      "<div class='wmw-y-label' style='top:", top_pct, "%;'>", tick_lbl, "</div>"
     )
   }
-  y_axis_ticks_str <- paste(y_axis_ticks_svg, collapse = "\n")
 
   fixed_y_axis_html <- paste0(
-"<svg class='wmw-y-axis-svg' viewBox='0 0 58 ", view_h, "' preserveAspectRatio='none'>
-<text x='52' y='13' class='wmw-y-axis-unit' text-anchor='end'>", unit_badge, "</text>
-<line x1='57' y1='", pad_top - 4, "' x2='57' y2='", baseline_y, "' stroke='#475569' stroke-width='1.5' />
-", y_axis_ticks_str, "
-</svg>")
+"<div class='wmw-y-axis-track'>
+  <div class='wmw-y-unit'>", unit_badge, "</div>
+  <div class='wmw-y-spine'></div>
+  ", paste(y_labels_html, collapse = "\n  "), "
+</div>")
 
   # Build Scrollable Timeline SVG
   view_w_timeline <- 900
@@ -302,8 +301,9 @@ wmw_interactive_chart <- function(
   grad_line_id <- paste0("grad-line-", metric)
   grad_area_id <- paste0("grad-area-", metric)
 
-  # X-Axis Month Labels
-  month_labels_svg <- character(n_pts)
+  # HTML X-axis labels (badge fonts) + SVG tick marks only
+  month_ticks_svg <- character(n_pts)
+  x_labels_html <- character(n_pts)
   for (i in seq_len(n_pts)) {
     yr_short <- substr(as.character(series$year[i]), 3, 4)
     lbl <- if (i == 1 || i == n_pts || series$month[i] == 1) {
@@ -312,13 +312,17 @@ wmw_interactive_chart <- function(
       series$month_label[i]
     }
     is_latest <- (i == n_pts)
-    cls <- if (is_latest) "wmw-axis-txt active" else "wmw-axis-txt"
-    month_labels_svg[i] <- paste0(
-      "<line x1='", round(x_coords[i], 1), "' y1='", baseline_y, "' x2='", round(x_coords[i], 1), "' y2='", baseline_y + 5, "' stroke='#334155' stroke-width='1.5' />\n",
-      "<text x='", round(x_coords[i], 1), "' y='", baseline_y + 19, "' class='", cls, "' text-anchor='middle'>", lbl, "</text>"
+    cls <- if (is_latest) "wmw-x-label active" else "wmw-x-label"
+    left_pct <- round((x_coords[i] / view_w_timeline) * 100, 2)
+    month_ticks_svg[i] <- paste0(
+      "<line x1='", round(x_coords[i], 1), "' y1='", baseline_y, "' x2='", round(x_coords[i], 1), "' y2='", baseline_y + 5, "' stroke='#334155' stroke-width='1.5' />"
+    )
+    x_labels_html[i] <- paste0(
+      "<span class='", cls, "' style='left:", left_pct, "%;'>", lbl, "</span>"
     )
   }
-  month_labels_svg_str <- paste(month_labels_svg, collapse = "\n")
+  month_ticks_svg_str <- paste(month_ticks_svg, collapse = "\n")
+  x_labels_html_str <- paste(x_labels_html, collapse = "\n")
 
   curr_x <- round(x_coords[n_pts], 1)
   curr_y <- round(y_obs[n_pts], 1)
@@ -348,7 +352,7 @@ wmw_interactive_chart <- function(
 
 <!-- X-Axis baseline and month tick marks -->
 <line x1='0' y1='", baseline_y, "' x2='", view_w_timeline, "' y2='", baseline_y, "' stroke='#334155' stroke-width='1.5' />
-", month_labels_svg_str, "
+", month_ticks_svg_str, "
 
 <!-- Mean-high markers -->
 <g class='wmw-markers-group'>")
@@ -406,7 +410,12 @@ wmw_interactive_chart <- function(
 <div class='wmw-viewport-shell'>
 <div class='wmw-viewport' id='", chart_id, "-viewport' tabindex='0'>
 <div class='wmw-canvas-wrap' id='", chart_id, "-canvas' style='width: 135%; min-width: 540px;'>
+<div class='wmw-plot-frame'>
 ", timeline_svg_html, "
+</div>
+<div class='wmw-x-labels'>
+", x_labels_html_str, "
+</div>
 </div>
 </div>
 </div>
