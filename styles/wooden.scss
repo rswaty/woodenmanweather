@@ -568,39 +568,44 @@ p.wmw-human-sub strong,
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
 }
 
-/* Chart Main Container (Pinned Y-Axis Pane + Scrollable Timeline) */
+/* Chart Main Container (Pinned Y-Axis Pane + Scrollable Timeline)
+   Aspect-locked so SVG text never non-uniformly squashes across screen sizes. */
 .wmw-chart-main {
-  display: flex !important;
-  flex-direction: row !important;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) !important;
   align-items: stretch !important;
   flex: 1 1 auto !important;
   position: relative !important;
-  min-height: 200px !important;
-  height: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
   margin-top: 4px !important;
   overflow: hidden !important;
+  width: 100% !important;
 }
 
 /* Pinned Y-Axis Pane (Always 100% visible, never scrolls away!) */
 .wmw-y-axis-pane {
-  flex: 0 0 58px !important;
   width: 58px !important;
-  height: 100% !important;
+  max-width: 58px !important;
+  height: auto !important;
+  min-height: 0 !important;
   position: relative !important;
   z-index: 5 !important;
   background: #090d13 !important;
   user-select: none !important;
+  align-self: stretch !important;
 }
 
 .wmw-y-axis-svg {
   width: 100% !important;
   height: 100% !important;
   display: block !important;
+  overflow: visible !important;
 }
 
 .wmw-y-axis-unit {
   fill: #94a3b8 !important;
-  font-size: 10.5px !important;
+  font-size: 12px !important;
   font-family: "Nirmala UI", "Nirmala", sans-serif !important;
   font-weight: 700 !important;
   letter-spacing: 0.04em !important;
@@ -608,25 +613,25 @@ p.wmw-human-sub strong,
 
 .wmw-y-axis-txt {
   fill: #e2e8f0 !important;
-  font-size: 11.5px !important;
+  font-size: 13px !important;
   font-family: "Nirmala UI", "Nirmala", sans-serif !important;
   font-weight: 600 !important;
 }
 
 /* Viewport & Scrolling Shell */
 .wmw-viewport-shell {
-  position: relative;
-  flex: 1 1 auto !important;
+  position: relative !important;
   min-width: 0 !important;
-  height: 100%;
-  overflow: hidden;
+  width: 100% !important;
+  height: auto !important;
+  overflow: hidden !important;
 }
 
 .wmw-viewport {
-  width: 100%;
-  height: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  width: 100% !important;
+  height: auto !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
   scroll-behavior: smooth;
   cursor: grab;
   user-select: none;
@@ -655,17 +660,22 @@ p.wmw-human-sub strong,
   cursor: grabbing;
 }
 
+/* Lock canvas to SVG viewBox ratio (900:230) so labels stay normal width */
 .wmw-canvas-wrap {
-  height: 100%;
-  min-height: 170px;
+  width: 135%;
+  min-width: 540px;
+  aspect-ratio: 900 / 230;
+  height: auto !important;
+  min-height: 0 !important;
   position: relative;
   transition: width 0.25s ease;
 }
 
 .wmw-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  overflow: visible !important;
 }
 
 /* SVG Elements & Styling */
@@ -695,7 +705,7 @@ p.wmw-human-sub strong,
 /* Crisp, Non-Overlapping Axes Labels */
 .wmw-axis-txt {
   fill: #cbd5e1;
-  font-size: 13px;
+  font-size: 14px;
   font-family: "Nirmala UI", "Nirmala", sans-serif;
   font-weight: 600;
 }
@@ -707,7 +717,7 @@ p.wmw-human-sub strong,
 
 .wmw-y-axis-txt {
   fill: #94a3b8;
-  font-size: 11.5px;
+  font-size: 13px;
   font-family: "Nirmala UI", "Nirmala", sans-serif;
   font-weight: 600;
 }

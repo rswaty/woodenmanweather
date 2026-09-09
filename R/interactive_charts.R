@@ -207,7 +207,7 @@ wmw_interactive_chart <- function(
   y_axis_ticks_str <- paste(y_axis_ticks_svg, collapse = "\n")
 
   fixed_y_axis_html <- paste0(
-"<svg class='wmw-y-axis-svg' viewBox='0 0 58 ", view_h, "' preserveAspectRatio='none'>
+"<svg class='wmw-y-axis-svg' viewBox='0 0 58 ", view_h, "' preserveAspectRatio='xMaxYMid meet'>
 <text x='52' y='13' class='wmw-y-axis-unit' text-anchor='end'>", unit_badge, "</text>
 <line x1='57' y1='", pad_top - 4, "' x2='57' y2='", baseline_y, "' stroke='#475569' stroke-width='1.5' />
 ", y_axis_ticks_str, "
@@ -301,7 +301,7 @@ wmw_interactive_chart <- function(
 
   # Build timeline SVG content
   timeline_svg_html <- paste0(
-"<svg class='wmw-svg' viewBox='0 0 ", view_w_timeline, " ", view_h, "' preserveAspectRatio='none'>
+"<svg class='wmw-svg' viewBox='0 0 ", view_w_timeline, " ", view_h, "' preserveAspectRatio='xMinYMid meet'>
 <defs>
 <linearGradient id='", grad_line_id, "' x1='0%' y1='0%' x2='100%' y2='0%'>
 ", grad_line_str, "
@@ -385,15 +385,25 @@ wmw_interactive_chart <- function(
   const viewport = document.getElementById(chartId + '-viewport');
   const canvas = document.getElementById(chartId + '-canvas');
   const card = document.getElementById(chartId);
+  const yPane = card ? card.querySelector('.wmw-y-axis-pane') : null;
 
   if (!viewport || !canvas) return;
 
   let userHasInteracted = false;
 
+  function syncYAxisHeight() {
+    if (!yPane) return;
+    const h = canvas.getBoundingClientRect().height;
+    if (h > 0) {
+      yPane.style.height = h + 'px';
+    }
+  }
+
   function scrollToEnd() {
     if (userHasInteracted) return;
     requestAnimationFrame(() => {
       viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+      syncYAxisHeight();
     });
   }
 
@@ -401,9 +411,14 @@ wmw_interactive_chart <- function(
   scrollToEnd();
   setTimeout(scrollToEnd, 50);
   setTimeout(scrollToEnd, 200);
+  setTimeout(syncYAxisHeight, 300);
 
   if (window.ResizeObserver) {
-    new ResizeObserver(() => { if (!userHasInteracted) scrollToEnd(); }).observe(viewport);
+    new ResizeObserver(() => {
+      syncYAxisHeight();
+      if (!userHasInteracted) scrollToEnd();
+    }).observe(viewport);
+    new ResizeObserver(syncYAxisHeight).observe(canvas);
   }
 
   // Translate vertical wheel to horizontal scroll inside viewport
@@ -431,11 +446,13 @@ wmw_interactive_chart <- function(
         canvas.style.width = '115%';
         requestAnimationFrame(() => {
           viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+          syncYAxisHeight();
         });
       } else if (action === 'zoom-12m') {
         userHasInteracted = true;
         canvas.style.width = '100%';
         viewport.scrollLeft = 0;
+        requestAnimationFrame(syncYAxisHeight);
       }
     });
   });
