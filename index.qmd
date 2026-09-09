@@ -23,6 +23,7 @@ library(scales)
 nws_context <- wmw_nws_context()
 forecast <- wmw_nws_forecast_periods(nws_context)
 rolling <- wmw_rolling_year_series()
+qpf_24h <- wmw_nws_qpf_24h_inches(nws_context)
 
 today_period <- forecast[forecast$is_daytime, ]
 today_high <- if (nrow(today_period) > 0) today_period$temperature[1] else forecast$temperature[1]
@@ -49,7 +50,7 @@ wmw_card_human_thermometer(today_high)
 #### Big Lake & Woodstove
 
 ```{r}
-wmw_card_lake_woodstove(today_high, forecast)
+wmw_card_lake_woodstove(today_high, forecast, context = nws_context, inches_24h = qpf_24h)
 ```
 
 ### Row {height=64%}

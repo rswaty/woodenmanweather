@@ -53,7 +53,7 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
     latest_obs_str <- paste0(round(latest_obs, 0), " °F")
 
     stat_label <- "Today's High:"
-    diff_context <- "vs. normal high"
+    diff_context <- "vs. recent normal"
     curr_color <- if (latest_obs >= latest_norm) pos_color else neg_color
 
   } else if (metric == "precipitation") {

@@ -1,7 +1,7 @@
 # Wooden Man Weather — Outpost Top Row Widgets (Option 1: Field Slate & Forest Pine)
 # Provides:
 # 1. Global Human Thermometer (Instrument Readout + Percentile Bar + Stats)
-# 2. Big Lake & Woodstove Gauge (Lake Superior, Breeze, Heating Index, Daylight Arc)
+# 2. Big Lake & Woodstove Gauge (Lake, Breeze, Heating, Daylight, Rain, Soil)
 
 source("R/constants.R")
 
@@ -113,13 +113,87 @@ wmw_calc_lake_breeze <- function(wind_dir, wind_speed) {
   }
 }
 
+#' Rain Gauge / 24-Hour Soak (Idea A)
+wmw_calc_rain_gauge <- function(inches_24h) {
+  if (is.null(inches_24h) || is.na(inches_24h)) inches_24h <- 0
+  inches_24h <- max(0, as.numeric(inches_24h))
+
+  if (inches_24h < 0.05) {
+    list(
+      amount_str = "Trace / Dry",
+      desc = "Dust on the gravel roads",
+      color = "#fbbf24"
+    )
+  } else if (inches_24h < 0.35) {
+    list(
+      amount_str = paste0(format(round(inches_24h, 1), nsmall = 1), " in Expected"),
+      desc = "Good for the gardens & root cellar",
+      color = "#34d399"
+    )
+  } else if (inches_24h < 0.75) {
+    list(
+      amount_str = paste0(format(round(inches_24h, 1), nsmall = 1), " in Expected"),
+      desc = "Steady soaker · Keep eaves clear",
+      color = "#38bdf8"
+    )
+  } else {
+    list(
+      amount_str = paste0(format(round(inches_24h, 1), nsmall = 1), " in Expected"),
+      desc = "Heavy soak · Sump pumps working",
+      color = "#60a5fa"
+    )
+  }
+}
+
+#' Rain Barrel / Soil Moisture Index (Idea D)
+wmw_calc_soil_moisture_index <- function(inches_24h) {
+  if (is.null(inches_24h) || is.na(inches_24h)) inches_24h <- 0
+  inches_24h <- max(0, as.numeric(inches_24h))
+
+  if (inches_24h < 0.05) {
+    list(
+      level = "Level 1",
+      title = "Dust",
+      desc = "Ground dry · Fire risk creeping up",
+      color = "#fbbf24"
+    )
+  } else if (inches_24h < 0.35) {
+    list(
+      level = "Level 2",
+      title = "Good Soak",
+      desc = "Garden damp · Rain barrels topped off",
+      color = "#34d399"
+    )
+  } else if (inches_24h < 0.75) {
+    list(
+      level = "Level 3",
+      title = "Two-Track Mud",
+      desc = "Standing puddles · Saturated woods",
+      color = "#38bdf8"
+    )
+  } else {
+    list(
+      level = "Level 4",
+      title = "Creek Rise",
+      desc = "Basement drains · Avoid dirt roads",
+      color = "#60a5fa"
+    )
+  }
+}
+
+#' Detroit-local Last Updated stamp (no leading spaces)
+wmw_format_updated_stamp <- function(when = Sys.time()) {
+  update_time <- lubridate::with_tz(as.POSIXct(when), "America/Detroit")
+  stamp <- format(update_time, "%a, %b %e · %l:%M %p %Z")
+  gsub("\\s+", " ", trimws(stamp))
+}
+
 #' CARD 1: Global Human Thermometer Widget
 wmw_card_human_thermometer <- function(today_high) {
   if (is.null(today_high) || is.na(today_high)) today_high <- 73
   ht <- wmw_calc_human_thermometer(today_high)
 
   accent_color <- if (ht$is_warmer_than_half) "#f59e0b" else "#38bdf8"
-  badge_text <- paste0("DAILY HIGH RANK: ", ht$percentile, "%")
 
   headline_html <- if (ht$is_warmer_than_half) {
     paste0(
@@ -147,11 +221,10 @@ wmw_card_human_thermometer <- function(today_high) {
 "<div class='wmw-outpost-card'>
   <div class='wmw-op-header'>
     <span class='wmw-op-title'>Global Human Thermometer</span>
-    <span class='wmw-op-badge' style='border-color: ", accent_color, "40; color: ", accent_color, ";'>", badge_text, "</span>
   </div>
   <div class='wmw-op-body'>
-    <p class='wmw-human-headline'>", headline_html, "</p>
-    <p class='wmw-human-sub'>", subtext_html, "</p>
+    <div class='wmw-human-headline'>", headline_html, "</div>
+    <div class='wmw-human-sub'>", subtext_html, "</div>
     
     <div class='wmw-earth-bar-shell'>
       <div class='wmw-earth-bar-track'>
@@ -176,7 +249,8 @@ wmw_card_human_thermometer <- function(today_high) {
 }
 
 #' CARD 2: Big Lake & Woodstove Gauge Widget
-wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date()) {
+wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
+                                    context = NULL, inches_24h = NULL) {
   lake <- wmw_calc_lake_superior_temp(date)
   daylight <- wmw_calc_daylight_arc(date)
   stove <- wmw_calc_woodstove_index(today_high)
@@ -186,16 +260,24 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date()) 
   first_wind_speed <- if (nrow(forecast_df) > 0) forecast_df$wind_speed[1] else "10 mph"
   surf <- wmw_calc_lake_breeze(first_wind_dir, first_wind_speed)
 
-  daylight_color <- if (daylight$is_decreasing) "#fca5a5" else "#86efac"
+  if (is.null(inches_24h)) {
+    if (is.null(context)) {
+      inches_24h <- tryCatch(wmw_nws_qpf_24h_inches(), error = function(e) 0)
+    } else {
+      inches_24h <- tryCatch(wmw_nws_qpf_24h_inches(context), error = function(e) 0)
+    }
+  }
 
-  update_time <- lubridate::with_tz(Sys.time(), "America/Detroit")
-  update_str <- trimws(gsub("  ", " ", format(update_time, "%a, %b %e · %l:%M %p %Z")))
+  rain <- wmw_calc_rain_gauge(inches_24h)
+  soil <- wmw_calc_soil_moisture_index(inches_24h)
+
+  daylight_color <- if (daylight$is_decreasing) "#fca5a5" else "#86efac"
+  update_str <- wmw_format_updated_stamp()
 
   html <- paste0(
 "<div class='wmw-outpost-card'>
   <div class='wmw-op-header'>
     <span class='wmw-op-title'>Big Lake & Woodstove</span>
-    <span class='wmw-op-badge' style='border-color: rgba(56, 189, 248, 0.45); color: #38bdf8;'>Lake Superior</span>
   </div>
   <div class='wmw-op-body'>
     <div class='wmw-gauge-list'>
@@ -210,6 +292,14 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date()) 
       <div class='wmw-gauge-item'>
         <span class='wmw-gauge-label'>Flannel & Stove Index</span>
         <span class='wmw-gauge-val'><strong style='color: ", stove$color, ";'>", stove$level, ": ", stove$title, "</strong> <span class='wmw-gauge-sub'>— ", stove$desc, "</span></span>
+      </div>
+      <div class='wmw-gauge-item'>
+        <span class='wmw-gauge-label'>Rain Gauge / 24-Hr Soak</span>
+        <span class='wmw-gauge-val'><strong style='color: ", rain$color, ";'>", rain$amount_str, "</strong> <span class='wmw-gauge-sub'>— ", rain$desc, "</span></span>
+      </div>
+      <div class='wmw-gauge-item'>
+        <span class='wmw-gauge-label'>Rain Barrel / Soil</span>
+        <span class='wmw-gauge-val'><strong style='color: ", soil$color, ";'>", soil$level, ": ", soil$title, "</strong> <span class='wmw-gauge-sub'>— ", soil$desc, "</span></span>
       </div>
       <div class='wmw-gauge-item'>
         <span class='wmw-gauge-label'>Daylight Arc</span>
@@ -232,7 +322,6 @@ wmw_card_sidebar_dispatch <- function() {
 "<div class='wmw-outpost-card wmw-sidebar-card'>
   <div class='wmw-op-header'>
     <span class='wmw-op-title'>Outpost Dispatch</span>
-    <span class='wmw-op-badge' style='border-color: rgba(245, 158, 11, 0.4); color: #f59e0b;'>Station Notes</span>
   </div>
   
   <div class='wmw-op-body' style='justify-content: flex-start; gap: 12px;'>
@@ -273,7 +362,7 @@ wmw_card_sidebar_dispatch <- function() {
 
   <div class='wmw-op-footer'>
     <div class='wmw-stat-pill'>Dispatch: <strong>Live</strong></div>
-    <div class='wmw-stat-pill'>Grid: <strong>MQT 100,56</strong></div>
+    <div class='wmw-stat-pill'>Grid: <strong>MQT 153,70</strong></div>
   </div>
 </div>")
 

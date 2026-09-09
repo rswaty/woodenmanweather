@@ -146,3 +146,36 @@ wmw_nws_current_summary <- function(context = wmw_nws_context()) {
     wind_direction = props$windDirection$value
   )
 }
+
+#' Next ~24h Quantitative Precipitation Forecast (inches) from NWS grid
+wmw_nws_qpf_24h_inches <- function(context = wmw_nws_context()) {
+  grid_url <- sub("/forecast$", "", context$forecast_url %||% "")
+  if (!nzchar(grid_url)) {
+    return(0)
+  }
+
+  grid <- tryCatch(wmw_get_json(grid_url), error = function(e) NULL)
+  if (is.null(grid)) {
+    return(0)
+  }
+
+  qpf <- grid$properties$quantitativePrecipitation$values
+  if (is.null(qpf) || !is.data.frame(qpf) || nrow(qpf) == 0) {
+    return(0)
+  }
+
+  now_utc <- as.POSIXct(Sys.time(), tz = "UTC")
+  end_utc <- now_utc + 24 * 3600
+
+  starts <- as.POSIXct(
+    sub("/.*$", "", qpf$validTime),
+    format = "%Y-%m-%dT%H:%M:%S",
+    tz = "UTC"
+  )
+  # Include bins that started recently (overlap with "now") through next 24h
+  keep <- !is.na(starts) & starts >= (now_utc - 6 * 3600) & starts < end_utc
+  mm <- sum(wmw_as_numeric(qpf$value[keep]), na.rm = TRUE)
+  if (is.na(mm) || mm < 0) mm <- 0
+
+  round(mm / 25.4, 2)
+}
