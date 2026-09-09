@@ -260,17 +260,6 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
   first_wind_speed <- if (nrow(forecast_df) > 0) forecast_df$wind_speed[1] else "10 mph"
   surf <- wmw_calc_lake_breeze(first_wind_dir, first_wind_speed)
 
-  if (is.null(inches_24h)) {
-    if (is.null(context)) {
-      inches_24h <- tryCatch(wmw_nws_qpf_24h_inches(), error = function(e) 0)
-    } else {
-      inches_24h <- tryCatch(wmw_nws_qpf_24h_inches(context), error = function(e) 0)
-    }
-  }
-
-  rain <- wmw_calc_rain_gauge(inches_24h)
-  soil <- wmw_calc_soil_moisture_index(inches_24h)
-
   daylight_color <- if (daylight$is_decreasing) "#fca5a5" else "#86efac"
   update_str <- wmw_format_updated_stamp()
 
@@ -294,14 +283,6 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
         <span class='wmw-gauge-val'><strong style='color: ", stove$color, ";'>", stove$level, ": ", stove$title, "</strong> <span class='wmw-gauge-sub'>— ", stove$desc, "</span></span>
       </div>
       <div class='wmw-gauge-item'>
-        <span class='wmw-gauge-label'>Rain Gauge / 24-Hr Soak</span>
-        <span class='wmw-gauge-val'><strong style='color: ", rain$color, ";'>", rain$amount_str, "</strong> <span class='wmw-gauge-sub'>— ", rain$desc, "</span></span>
-      </div>
-      <div class='wmw-gauge-item'>
-        <span class='wmw-gauge-label'>Rain Barrel / Soil</span>
-        <span class='wmw-gauge-val'><strong style='color: ", soil$color, ";'>", soil$level, ": ", soil$title, "</strong> <span class='wmw-gauge-sub'>— ", soil$desc, "</span></span>
-      </div>
-      <div class='wmw-gauge-item'>
         <span class='wmw-gauge-label'>Daylight Arc</span>
         <span class='wmw-gauge-val'><strong style='color: #ffffff;'>", daylight$length_str, "</strong> <span class='wmw-gauge-sub' style='color: ", daylight_color, "; font-weight: 600;'>&nbsp;(", daylight$change_str, ")</span></span>
       </div>
@@ -316,7 +297,7 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
   htmltools::HTML(html)
 }
 
-#' CARD 3: Left Column Notes & Logo Placeholder Widget
+#' CARD 3: Left Column Logo Placeholder Widget
 wmw_card_sidebar_dispatch <- function() {
   html <- paste0(
 "<div class='wmw-outpost-card wmw-sidebar-card'>
@@ -325,7 +306,6 @@ wmw_card_sidebar_dispatch <- function() {
   </div>
   
   <div class='wmw-op-body' style='justify-content: flex-start; gap: 12px;'>
-    <!-- Logo Placeholder Box -->
     <div class='wmw-logo-box'>
       <div class='wmw-logo-emblem'>
         <svg width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='#38bdf8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'>
@@ -337,26 +317,6 @@ wmw_card_sidebar_dispatch <- function() {
       <div class='wmw-logo-title'>Wooden Man Weather</div>
       <div class='wmw-logo-sub'>Marquette · Lake Superior Outpost</div>
       <div class='wmw-logo-tag'>[ Logo Placeholder ]</div>
-    </div>
-
-    <!-- Dispatch & Notes Section -->
-    <div class='wmw-notes-container'>
-      <div class='wmw-notes-header'>FIELD &amp; COMMUNITY NOTES</div>
-      
-      <div class='wmw-note-entry'>
-        <div class='wmw-note-date'>Seasonal Advisory</div>
-        <div class='wmw-note-text'>Early September lake breezes keep shore brisk. Check evening drafts as overnight lows begin dipping.</div>
-      </div>
-
-      <div class='wmw-note-entry'>
-        <div class='wmw-note-date'>Woodpile Prep</div>
-        <div class='wmw-note-text'>Ensure split hardwood is stacked and top-covered before late September lake gales set in.</div>
-      </div>
-
-      <div class='wmw-note-entry'>
-        <div class='wmw-note-date'>Monday Briefing</div>
-        <div class='wmw-note-text'>Work-week task timing, planting windows, and weather forecasts publish every Monday morning.</div>
-      </div>
     </div>
   </div>
 

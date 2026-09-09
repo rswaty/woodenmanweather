@@ -11,7 +11,14 @@
 
 source("R/constants.R")
 
-wmw_interactive_chart <- function(series, metric = c("temperature", "precipitation", "snowfall"), chart_id = NULL, today_high = NULL) {
+wmw_interactive_chart <- function(
+  series,
+  metric = c("temperature", "precipitation", "snowfall"),
+  chart_id = NULL,
+  today_high = NULL,
+  today_low = NULL,
+  month_total = NULL
+) {
   metric <- match.arg(metric)
   if (is.null(chart_id)) {
     chart_id <- paste0("wmw-chart-", metric)
@@ -23,6 +30,8 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
   if (n_pts == 0) {
     return(htmltools::HTML(paste0("<div class='wmw-chart-error'>No data available for ", metric, "</div>")))
   }
+
+  secondary_badge_html <- ""
 
   # Metric specific divergence palettes & calculations
   if (metric == "temperature") {
@@ -56,6 +65,16 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
     diff_context <- "vs. recent normal"
     curr_color <- if (latest_obs >= latest_norm) pos_color else neg_color
 
+    if (!is.null(today_low) && !is.na(today_low)) {
+      low_str <- paste0(round(as.numeric(today_low), 0), " °F")
+      secondary_badge_html <- paste0(
+        "<div class='wmw-stat-badge'>",
+        "<span class='wmw-stat-now-label'>Today's Low:</span>",
+        "<span class='wmw-stat-now-value'>", low_str, "</span>",
+        "</div>"
+      )
+    }
+
   } else if (metric == "precipitation") {
     unit <- "in"
     tick_unit <- " in"
@@ -84,6 +103,17 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
     diff_context <- "vs. recent normal"
     curr_color <- if (cum_diff >= 0) pos_color else neg_color
 
+    if (!is.null(month_total) && !is.na(month_total)) {
+      mo_str <- paste0(format(round(as.numeric(month_total), digits), nsmall = digits), " in")
+      secondary_badge_html <- paste0(
+        "<div class='wmw-stat-badge'>",
+        "<span class='wmw-stat-now-label'>1-Mo Total:</span>",
+        "<span class='wmw-stat-now-value'>", mo_str, "</span>",
+        "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(last 30 days)</span>",
+        "</div>"
+      )
+    }
+
   } else { # snowfall
     unit <- "in"
     tick_unit <- " in"
@@ -111,6 +141,17 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
     stat_label <- "12-Mo Total:"
     diff_context <- "vs. recent normal"
     curr_color <- if (cum_diff >= 0) pos_color else neg_color
+
+    if (!is.null(month_total) && !is.na(month_total)) {
+      mo_str <- paste0(round(as.numeric(month_total), digits), " in")
+      secondary_badge_html <- paste0(
+        "<div class='wmw-stat-badge'>",
+        "<span class='wmw-stat-now-label'>1-Mo Total:</span>",
+        "<span class='wmw-stat-now-value'>", mo_str, "</span>",
+        "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(last 30 days)</span>",
+        "</div>"
+      )
+    }
   }
 
   # Canvas coordinate space:
@@ -324,10 +365,13 @@ wmw_interactive_chart <- function(series, metric = c("temperature", "precipitati
 
 <!-- Clean Status & Controls Bar BELOW the chart -->
 <div class='wmw-chart-bottom-bar'>
-<div class='wmw-bottom-current'>
+<div class='wmw-bottom-stats'>
+<div class='wmw-stat-badge'>
 <span class='wmw-stat-now-label'>", stat_label, "</span>
 <span class='wmw-stat-now-value'>", latest_obs_str, "</span>
 <span class='wmw-stat-now-diff' style='color: ", curr_color, ";'>(", diff_str, " ", diff_context, ")</span>
+</div>
+", secondary_badge_html, "
 </div>
 <div class='wmw-nav-tools'>
 <button type='button' class='wmw-pill-btn active' data-action='zoom-now'>Now</button>

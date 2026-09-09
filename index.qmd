@@ -23,10 +23,12 @@ library(scales)
 nws_context <- wmw_nws_context()
 forecast <- wmw_nws_forecast_periods(nws_context)
 rolling <- wmw_rolling_year_series()
-qpf_24h <- wmw_nws_qpf_24h_inches(nws_context)
+totals_30d <- wmw_last_30d_totals()
 
 today_period <- forecast[forecast$is_daytime, ]
+night_period <- forecast[!forecast$is_daytime, ]
 today_high <- if (nrow(today_period) > 0) today_period$temperature[1] else forecast$temperature[1]
+today_low <- if (nrow(night_period) > 0) night_period$temperature[1] else NA_real_
 ```
 
 ## Column {width=20%}
@@ -50,7 +52,7 @@ wmw_card_human_thermometer(today_high)
 #### Big Lake & Woodstove
 
 ```{r}
-wmw_card_lake_woodstove(today_high, forecast, context = nws_context, inches_24h = qpf_24h)
+wmw_card_lake_woodstove(today_high, forecast, context = nws_context)
 ```
 
 ### Row {height=64%}
@@ -58,17 +60,17 @@ wmw_card_lake_woodstove(today_high, forecast, context = nws_context, inches_24h 
 #### Temperature
 
 ```{r}
-wmw_interactive_chart(rolling, "temperature", today_high = today_high)
+wmw_interactive_chart(rolling, "temperature", today_high = today_high, today_low = today_low)
 ```
 
 #### Precipitation
 
 ```{r}
-wmw_interactive_chart(rolling, "precipitation")
+wmw_interactive_chart(rolling, "precipitation", month_total = totals_30d$prcp_in)
 ```
 
 #### Snowfall
 
 ```{r}
-wmw_interactive_chart(rolling, "snowfall")
+wmw_interactive_chart(rolling, "snowfall", month_total = totals_30d$snow_in)
 ```

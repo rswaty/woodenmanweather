@@ -150,6 +150,34 @@ wmw_rolling_year_series <- function(
   monthly
 }
 
+#' Rolling last-30-day precip and snowfall totals from daily cache / NCEI
+wmw_last_30d_totals <- function(
+  end_date = Sys.Date(),
+  station = wmw_station_id()
+) {
+  start_date <- end_date - 29
+  daily_cache <- file.path("data", "climate_daily.csv")
+
+  daily <- if (file.exists(daily_cache) && file.size(daily_cache) > 0) {
+    readr::read_csv(daily_cache, show_col_types = FALSE)
+  } else {
+    wmw_ncei_daily(start_date, end_date, station = station)
+  }
+
+  if (!"date" %in% names(daily) || nrow(daily) == 0) {
+    return(list(prcp_in = 0, snow_in = 0, n_days = 0L))
+  }
+
+  daily$date <- as.Date(daily$date)
+  recent <- daily[daily$date >= start_date & daily$date <= end_date, , drop = FALSE]
+
+  list(
+    prcp_in = sum(wmw_as_numeric(recent$prcp_in), na.rm = TRUE),
+    snow_in = sum(wmw_as_numeric(recent$snow_in), na.rm = TRUE),
+    n_days = nrow(recent)
+  )
+}
+
 wmw_plot_rolling_metric <- function(series, obs_col, normal_col, title, ylab) {
   plot_df <- data.frame(
     month_label = factor(series$month_label, levels = unique(series$month_label)),
