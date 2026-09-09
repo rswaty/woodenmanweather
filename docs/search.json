@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Wooden Man Weather is a Marquette-focused weather dashboard and Monday work-week briefing. The dashboard shows National Weather Service forecasts, active alerts, and rolling twelve-month comparisons of temperature, precipitation, and snowfall against NOAA 1991–2020 normals for station USW00094850."
+  },
+  {
+    "objectID": "about.html#what-this-is",
+    "href": "about.html#what-this-is",
+    "title": "About",
+    "section": "",
+    "text": "Wooden Man Weather is a Marquette-focused weather dashboard and Monday work-week briefing. The dashboard shows National Weather Service forecasts, active alerts, and rolling twelve-month comparisons of temperature, precipitation, and snowfall against NOAA 1991–2020 normals for station USW00094850."
+  },
+  {
+    "objectID": "about.html#how-it-updates",
+    "href": "about.html#how-it-updates",
+    "title": "About",
+    "section": "How it updates",
+    "text": "How it updates\nThe site is built with Quarto and published to GitHub Pages. A GitHub Actions workflow renders the project on pushes to main and on a daily schedule so forecasts and climate caches stay current without a Shiny server."
+  },
+  {
+    "objectID": "about.html#attribution",
+    "href": "about.html#attribution",
+    "title": "About",
+    "section": "Attribution",
+    "text": "Attribution\nForecast and alert data: National Weather Service. Historical observations and normals: NOAA National Centers for Environmental Information. This is an independent project and is not endorsed by NOAA or the NWS."
+  },
+  {
+    "objectID": "about.html#business-plan",
+    "href": "about.html#business-plan",
+    "title": "About",
+    "section": "Business plan",
+    "text": "Business plan\nThe working business plan for Wooden Man Weather is kept in BUSINESS_PLAN.md in the repository root.\nBack to the dashboard"
+  },
+  {
+    "objectID": "monday.html",
+    "href": "monday.html",
+    "title": "Monday work-week briefing",
+    "section": "",
+    "text": "Wooden Man Weather publishes a practical outlook each Monday for the Marquette work week. Forecasts come from the National Weather Service; climate context uses NOAA daily summaries for station USW00094850.\nHeadline: Mostly Sunny\nObservation: 81°F at Marquette Sawyer Regional Airport (Sep 07, 2026 04:49 PM EDT)."
+  },
+  {
+    "objectID": "monday.html#week-of-september-0711-2026",
+    "href": "monday.html#week-of-september-0711-2026",
+    "title": "Monday work-week briefing",
+    "section": "",
+    "text": "Wooden Man Weather publishes a practical outlook each Monday for the Marquette work week. Forecasts come from the National Weather Service; climate context uses NOAA daily summaries for station USW00094850.\nHeadline: Mostly Sunny\nObservation: 81°F at Marquette Sawyer Regional Airport (Sep 07, 2026 04:49 PM EDT)."
+  },
+  {
+    "objectID": "monday.html#work-week-strip",
+    "href": "monday.html#work-week-strip",
+    "title": "Monday work-week briefing",
+    "section": "Work-week strip",
+    "text": "Work-week strip\n\n\n\n\n\n\n\n\n\n\n\n\nDay\nHigh (°F)\nForecast\nPrecip %\nWind\n\n\n\n\nLabor Day\n82\nMostly Sunny\n1\nS 10 mph\n\n\nTonight\nNA\nMostly Cloudy\n11\nS 10 mph\n\n\nTuesday\n73\nShowers And Thunderstorms\n92\nS 10 to 20 mph\n\n\nTuesday Night\nNA\nChance Showers And Thunderstorms\n42\nSW 10 to 20 mph\n\n\nWednesday\n78\nMostly Sunny\n12\nW 10 to 20 mph\n\n\nWednesday Night\nNA\nMostly Clear\n5\nW 10 to 20 mph\n\n\nThursday\n69\nSunny\n1\nNW 5 to 15 mph\n\n\nThursday Night\nNA\nMostly Clear\n0\nSE 5 to 10 mph\n\n\nFriday\n78\nSunny\n8\nSW 10 to 20 mph\n\n\nFriday Night\nNA\nChance Rain Showers\n50\nSW 15 to 20 mph"
+  },
+  {
+    "objectID": "monday.html#wooden-man-tasks",
+    "href": "monday.html#wooden-man-tasks",
+    "title": "Monday work-week briefing",
+    "section": "Wooden Man tasks",
+    "text": "Wooden Man tasks\n\n\n\n\n\n\n\n\n\nTask\nGuidance\n\n\n\n\nWinter prep\nService furnaces, inspect roof edges, and stage snow tools before the first lasting lake-effect cycle.\n\n\nWet-week logistics\nPrecipitation chances climb mid-week. Move outdoor deliveries under cover and plan for muddy job sites away from the lakeshore.\n\n\nWarm-week outdoor block\nDaytime highs near or above 70°F favor exterior paint, roof patch work, and dock prep when winds stay manageable."
+  },
+  {
+    "objectID": "monday.html#data-notes",
+    "href": "monday.html#data-notes",
+    "title": "Monday work-week briefing",
+    "section": "Data notes",
+    "text": "Data notes\n\nNormals: 1991–2020 monthly averages for USW00094850.\nAirport readings may differ from lakeshore or hilltop conditions.\nThis page is generated from rule-based seasonal triggers plus the current NWS forecast; edit R/tasks.R as the library grows.\n\nReturn to the dashboard"
+  }
+]
