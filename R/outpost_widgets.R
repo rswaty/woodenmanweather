@@ -261,7 +261,6 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
   surf <- wmw_calc_lake_breeze(first_wind_dir, first_wind_speed)
 
   daylight_color <- if (daylight$is_decreasing) "#fca5a5" else "#86efac"
-  update_str <- wmw_format_updated_stamp()
 
   html <- paste0(
 "<div class='wmw-outpost-card'>
@@ -288,10 +287,6 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
       </div>
     </div>
   </div>
-  <div class='wmw-op-footer'>
-    <div class='wmw-stat-pill'>Last Updated: <strong>", update_str, "</strong></div>
-    <div class='wmw-stat-pill'>Station: <strong>Marquette 46.54°N</strong></div>
-  </div>
 </div>")
 
   htmltools::HTML(html)
@@ -299,6 +294,8 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
 
 #' CARD 3: Left Column Logo Placeholder Widget
 wmw_card_sidebar_dispatch <- function() {
+  update_str <- wmw_format_updated_stamp()
+
   html <- paste0(
 "<div class='wmw-outpost-card wmw-sidebar-card'>
   <div class='wmw-op-header'>
@@ -320,6 +317,10 @@ wmw_card_sidebar_dispatch <- function() {
     </div>
   </div>
 
+  <div class='wmw-op-footer wmw-sidebar-footer'>
+    <div class='wmw-stat-pill'>Last Updated: <strong>", update_str, "</strong></div>
+    <div class='wmw-stat-pill'>Station: <strong>Marquette 46.54°N</strong></div>
+  </div>
 </div>")
 
   htmltools::HTML(html)

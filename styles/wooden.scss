@@ -455,6 +455,21 @@ p.wmw-human-sub strong,
   height: 100% !important;
 }
 
+.wmw-sidebar-card .wmw-op-footer,
+.wmw-sidebar-card .wmw-sidebar-footer {
+  margin-top: auto !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+}
+
+.wmw-sidebar-card .wmw-stat-pill {
+  width: 100% !important;
+  justify-content: space-between !important;
+  white-space: normal !important;
+  line-height: 1.35 !important;
+}
+
 .wmw-logo-box {
   background: #0b111a !important;
   border: 1px dashed rgba(56, 189, 248, 0.35) !important;
