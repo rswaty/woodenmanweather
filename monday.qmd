@@ -55,7 +55,7 @@ if (nrow(forecast_7d) == 0) {
 
 ## Wooden Man tasks
 
-Outdoor first. Foul weather gets an indoor stretch. No traffic tips — this is Marquette.
+Outdoor first, tied to **this** 7-day forecast. Foul stretches get an indoor backup. No traffic tips — this is Marquette.
 
 ```{r}
 knitr::kable(task_table, col.names = c("Task", "Guidance"), align = "ll")
@@ -65,6 +65,7 @@ knitr::kable(task_table, col.names = c("Task", "Guidance"), align = "ll")
 
 - Normals: `r wmw_normals_start_year()`–`r wmw_normals_end_year()` monthly averages for `r wmw_station_id()`.
 - Airport readings may differ from lakeshore or hilltop conditions.
-- This page is generated from rule-based seasonal triggers plus the current NWS forecast; edit `R/tasks.R` as the library grows.
+- **Monday edits:** open `R/tasks.R` and change only the `wmw_manual_monday_tasks` list at the top (hand-written tasks appear first). Leave it as `list()` to use the auto weather/season tasks. Then run `quarto render monday.qmd` or push to `main` and let Actions rebuild.
+- Auto rules (warmest/wettest/windiest day, week pattern, winter buck-up) live in the same file below the Monday hook.
 
 [Return to the dashboard](index.qmd)

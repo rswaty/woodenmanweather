@@ -1,5 +1,23 @@
 source("R/constants.R")
 
+# =============================================================================
+# MONDAY EDIT HOOK — change tasks here when you hand-tune the weekly outlook
+# File: R/tasks.R  (this block only, unless you are changing auto rules below)
+# After editing: quarto render monday.qmd  (or push and let Actions rebuild)
+#
+# Put 0–3 hand-written tasks here. They appear first and are never dropped
+# by the auto cap. Leave as list() to rely on weather/season auto tasks only.
+#
+# Example:
+# wmw_manual_monday_tasks <- list(
+#   list(
+#     title = "Friday is the gift",
+#     detail = "Highs near 80 and sunny — hammock or Presque Isle rocks while it lasts."
+#   )
+# )
+# =============================================================================
+wmw_manual_monday_tasks <- list()
+
 #' Parse a rough max mph from NWS wind_speed strings like "10 to 15 mph".
 wmw_parse_wind_mph <- function(wind_speed) {
   if (is.null(wind_speed) || length(wind_speed) == 0) {
@@ -15,70 +33,123 @@ wmw_parse_wind_mph <- function(wind_speed) {
   max(nums, na.rm = TRUE)
 }
 
-#' Fair vs foul outdoor week from NWS work-week periods.
-wmw_week_outdoor_mood <- function(work_week) {
-  if (is.null(work_week) || nrow(work_week) == 0) {
-    return(list(
-      foul = FALSE,
-      breezy = FALSE,
-      mild = FALSE,
-      precip_chance = NA_real_,
-      max_high = NA_real_,
-      max_wind = NA_real_
-    ))
-  }
-
-  precip_chance <- suppressWarnings(max(work_week$probability_of_precipitation, na.rm = TRUE))
-  if (!is.finite(precip_chance)) precip_chance <- NA_real_
-
-  daytime <- work_week[work_week$is_daytime %in% TRUE, , drop = FALSE]
-  max_high <- if (nrow(daytime) > 0) {
-    suppressWarnings(max(daytime$temperature, na.rm = TRUE))
-  } else {
-    suppressWarnings(max(work_week$temperature, na.rm = TRUE))
-  }
-  if (!is.finite(max_high)) max_high <- NA_real_
-
-  winds <- vapply(work_week$wind_speed, wmw_parse_wind_mph, numeric(1))
-  max_wind <- suppressWarnings(max(winds, na.rm = TRUE))
-  if (!is.finite(max_wind)) max_wind <- NA_real_
-
-  forecast_blob <- tolower(paste(
-    work_week$short_forecast,
-    work_week$detailed_forecast,
-    collapse = " "
-  ))
-  severe_words <- grepl(
-    "heavy rain|flood|blizzard|ice storm|freezing rain|wintry mix|lake effect snow|snow shower|severe thunderstorm",
-    forecast_blob
-  )
-  chance_storms <- grepl("thunder", forecast_blob)
-
-  # Foul = clearly wet/cold or severe — not a lone "chance thunderstorms" on a warm day
-  foul <- isTRUE(precip_chance >= 60) ||
-    (isTRUE(precip_chance >= 45) && isTRUE(max_high < 55)) ||
-    severe_words ||
-    (chance_storms && isTRUE(precip_chance >= 50) && isTRUE(max_high < 65))
-
-  breezy <- isTRUE(max_wind >= 15)
-  mild <- isTRUE(max_high >= 60)
-
-  list(
-    foul = foul,
-    breezy = breezy,
-    mild = mild,
-    precip_chance = precip_chance,
-    max_high = max_high,
-    max_wind = max_wind
-  )
-}
-
 wmw_add_task <- function(tasks, title, detail) {
   tasks[[length(tasks) + 1]] <- list(title = title, detail = detail)
   tasks
 }
 
-#' Weekly Wooden Man tasks — outdoor Marquette geography first; foul-weather indoor stretch.
+wmw_clean_day_label <- function(name) {
+  nm <- as.character(name)
+  nm <- sub(" Night$", "", nm, ignore.case = TRUE)
+  nm
+}
+
+#' Daytime strip summary for the rolling forecast (one row per daytime period).
+wmw_forecast_day_strip <- function(forecast) {
+  if (is.null(forecast) || nrow(forecast) == 0) {
+    return(data.frame(
+      day = character(),
+      temp = numeric(),
+      precip = numeric(),
+      wind = numeric(),
+      short = character(),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  day <- forecast[forecast$is_daytime %in% TRUE, , drop = FALSE]
+  if (nrow(day) == 0) {
+    day <- forecast
+  }
+
+  data.frame(
+    day = vapply(day$name, wmw_clean_day_label, character(1)),
+    temp = as.numeric(day$temperature),
+    precip = as.numeric(day$probability_of_precipitation),
+    wind = vapply(day$wind_speed, wmw_parse_wind_mph, numeric(1)),
+    short = as.character(day$short_forecast),
+    stringsAsFactors = FALSE
+  )
+}
+
+#' Score the week: warmest / wettest / windiest days + simple pattern.
+wmw_week_weather_facts <- function(forecast) {
+  strip <- wmw_forecast_day_strip(forecast)
+  empty <- list(
+    strip = strip,
+    warmest = NULL,
+    wettest = NULL,
+    windiest = NULL,
+    dry_days = character(),
+    pattern = "unknown",
+    max_high = NA_real_,
+    max_precip = NA_real_,
+    max_wind = NA_real_
+  )
+  if (nrow(strip) == 0) {
+    return(empty)
+  }
+
+  strip$precip[!is.finite(strip$precip)] <- 0
+  strip$wind[!is.finite(strip$wind)] <- 0
+
+  i_warm <- which.max(strip$temp)
+  i_wet <- which.max(strip$precip)
+  i_wind <- which.max(strip$wind)
+
+  dry_days <- strip$day[strip$precip < 30 & is.finite(strip$temp)]
+  n <- nrow(strip)
+  early <- strip[seq_len(min(3L, n)), , drop = FALSE]
+  late <- strip[seq.int(max(1L, n - 2L), n), , drop = FALSE]
+  early_wet <- mean(early$precip, na.rm = TRUE)
+  late_wet <- mean(late$precip, na.rm = TRUE)
+
+  pattern <- if (isTRUE(early_wet < 28) && (isTRUE(late_wet >= 35) || isTRUE(max(late$precip, na.rm = TRUE) >= 55))) {
+    "nice_then_wet"
+  } else if (isTRUE(early_wet >= 40) && isTRUE(late_wet < 28)) {
+    "wet_then_nice"
+  } else if (isTRUE(max(strip$precip, na.rm = TRUE) >= 55)) {
+    "stormy_lurking"
+  } else if (isTRUE(max(strip$wind, na.rm = TRUE) >= 18) && isTRUE(max(strip$precip, na.rm = TRUE) < 40)) {
+    "windy_dry"
+  } else if (isTRUE(max(strip$precip, na.rm = TRUE) < 30)) {
+    "mostly_fair"
+  } else {
+    "mixed"
+  }
+
+  list(
+    strip = strip,
+    warmest = strip[i_warm, , drop = FALSE],
+    wettest = strip[i_wet, , drop = FALSE],
+    windiest = strip[i_wind, , drop = FALSE],
+    dry_days = dry_days,
+    pattern = pattern,
+    max_high = max(strip$temp, na.rm = TRUE),
+    max_precip = max(strip$precip, na.rm = TRUE),
+    max_wind = max(strip$wind, na.rm = TRUE)
+  )
+}
+
+wmw_fmt_temp <- function(x) {
+  if (!is.finite(x)) return("—")
+  paste0(round(x, 0), "°F")
+}
+
+wmw_fmt_precip <- function(x) {
+  if (!is.finite(x)) return("—")
+  paste0(round(x, 0), "%")
+}
+
+wmw_fmt_wind <- function(x) {
+  if (!is.finite(x)) return("—")
+  paste0(round(x, 0), " mph")
+}
+
+#' Weekly Wooden Man tasks — day-aware from the 7-day strip + season.
+#'
+#' Monday editors: prefer `wmw_manual_monday_tasks` at the top of this file.
+#' Auto rules below only need edits when you change the logic itself.
 wmw_monday_tasks <- function(
   work_week = NULL,
   current = NULL,
@@ -86,130 +157,198 @@ wmw_monday_tasks <- function(
   today = lubridate::with_tz(Sys.time(), "America/Detroit")
 ) {
   tasks <- list()
-
   month <- lubridate::month(today)
-  weekday <- lubridate::wday(today, week_start = 1)
-  mood <- wmw_week_outdoor_mood(work_week)
+  facts <- wmw_week_weather_facts(work_week)
 
-  if (weekday != 1) {
-    tasks <- wmw_add_task(
-      tasks,
-      "Briefing cadence",
-      "This weekly briefing refreshes often. The outdoor ideas still work any day — the forecast table always covers the next seven days."
-    )
-  }
-
-  # --- Core week: fair outdoors vs foul indoors ---------------------------------
-  if (isTRUE(mood$foul)) {
-    tasks <- wmw_add_task(
-      tasks,
-      "Foul-weather stretch",
-      "When Presque Isle is a wash, stretch the day indoors: Peter White Public Library (217 N Front — closed Sundays), a long sit at Dead River Coffee on Baraga, or try a downtown place you have not done this season (Delft, Lagniappe, Vierling, Zephyr)."
-    )
-    tasks <- wmw_add_task(
-      tasks,
-      "MarqTran adventure",
-      "Ride MarqTran out to Ishpeming or Negaunee, poke around Main Street, warm up somewhere, ride home. Check today’s timetable at marq-tran.com — low-cost foul-day wandering without needing a plan."
-    )
-    tasks <- wmw_add_task(
-      tasks,
-      "Breaks of blue",
-      "If the sky opens even half an hour, take it: Fit Strip out-and-back, a quick sit on the Presque Isle rocks, or a hammock/blanket with a friend before it closes back in."
-    )
-  } else {
-    tasks <- wmw_add_task(
-      tasks,
-      "Lakeshore stretch",
-      "Start soft outside: ten quiet minutes on the Presque Isle rocks, a Fit Strip loop with nowhere to be, or a hammock and blanket with a friend at Tourist Park. Stay out longer than you meant to."
-    )
-
-    if (isTRUE(mood$breezy) || month %in% c(4, 5, 9, 10)) {
-      tasks <- wmw_add_task(
-        tasks,
-        "Wind day",
-        "If the breeze is up, it is kite weather on the open grass at Presque Isle — or just lean into the lake wind on a shore path bench. No kite? Same wind works. Board people: watch the water near the lower harbor / Ore Dock even if you are not on one."
-      )
-    } else {
-      tasks <- wmw_add_task(
-        tasks,
-        "Quiet hands outside",
-        "Outdoor knitting, a book, or cards at a Presque Isle picnic table or a sheltered yard nook. Mild evening? Stretch it facing the water at McCarty’s Cove or the peninsula tip."
-      )
-    }
-
-    if (isTRUE(mood$mild) || month %in% c(6, 7, 8, 9)) {
-      tasks <- wmw_add_task(
-        tasks,
-        "Longer outdoor hang",
-        "Picnic blanket, throw, thermos — Fit Strip with sit-stops, a slow Presque Isle wander (lighthouse side, then grass), or hammock round two at dusk. Pointless and nice still counts."
-      )
+  # Manual Monday tasks first
+  if (length(wmw_manual_monday_tasks) > 0) {
+    for (t in wmw_manual_monday_tasks) {
+      if (!is.null(t$title) && !is.null(t$detail)) {
+        tasks <- wmw_add_task(tasks, t$title, t$detail)
+      }
     }
   }
 
-  # Midweek culture nod (stable rhythm; listings move)
-  tasks <- wmw_add_task(
-    tasks,
-    "Midweek local night",
-    "Marquette’s small-stage / open-mic energy usually shows up midweek. Check the current week at marquettemusicscene.com before you go — or use it as ‘what’s humming’ while you stay in with tea and a window cracked."
-  )
-
-  # --- Seasonal color (living outdoors / lake year), inclusive -------------------
-  if (month %in% c(4, 5)) {
+  # --- Week pattern (specific to this forecast) --------------------------------
+  if (identical(facts$pattern, "nice_then_wet") && !is.null(facts$warmest)) {
+    w <- facts$warmest
+    wet <- facts$wettest
     tasks <- wmw_add_task(
       tasks,
-      "Mud-season garden beds",
-      "If your soil (yard, plot, or a borrowed corner) is workable and hard frost is not looming, cool-season starts like peas and onions can go in. Keep row cover handy. No garden? Same week favors long Fit Strip walks between showers."
+      paste0("Use ", w$day, " while it is still easy"),
+      paste0(
+        "This week starts kinder than it finishes. ",
+        w$day, " looks like the outdoor gift (near ", wmw_fmt_temp(w$temp), ", ",
+        tolower(w$short), "). Hammock, Fit Strip, or Presque Isle rocks — stay out longer than you meant to. ",
+        "Save flexibility for ", wet$day, " when precip odds climb (", wmw_fmt_precip(wet$precip), ")."
+      )
+    )
+  } else if (identical(facts$pattern, "wet_then_nice") && !is.null(facts$warmest)) {
+    w <- facts$warmest
+    wet <- facts$wettest
+    tasks <- wmw_add_task(
+      tasks,
+      paste0("Hold for ", w$day, "; soft start if it is wet"),
+      paste0(
+        "Early days look wetter (", wet$day, " ~", wmw_fmt_precip(wet$precip),
+        "). Peter White Library, Dead River Coffee, or MarqTran to Ishpeming if you need a stretch indoors. ",
+        "Then spend ", w$day, " outside near ", wmw_fmt_temp(w$temp), " — shore sit or Fit Strip when it clears."
+      )
+    )
+  } else if (identical(facts$pattern, "mostly_fair") && !is.null(facts$warmest)) {
+    w <- facts$warmest
+    tasks <- wmw_add_task(
+      tasks,
+      "Fair stretch — bank outdoor time",
+      paste0(
+        "Precip stays mostly quiet this week. Peak mild looks like ", w$day,
+        " near ", wmw_fmt_temp(w$temp), ". Picnic blanket, knitting outside, or a slow Presque Isle wander. ",
+        "No gear needed for a shoreline sit."
+      )
+    )
+  } else if (identical(facts$pattern, "windy_dry") && !is.null(facts$windiest)) {
+    wi <- facts$windiest
+    tasks <- wmw_add_task(
+      tasks,
+      paste0(wi$day, " is the wind day"),
+      paste0(
+        "Dry enough to be out, breezy enough to feel it — up toward ", wmw_fmt_wind(wi$wind),
+        " on ", wi$day, ". Kite at Presque Isle if you have one; otherwise lean into the lake wind on a shore-path bench. ",
+        "Board folks: watch the lower harbor / Ore Dock even if you stay ashore."
+      )
+    )
+  } else if (identical(facts$pattern, "stormy_lurking") && !is.null(facts$wettest)) {
+    wet <- facts$wettest
+    tasks <- wmw_add_task(
+      tasks,
+      paste0(wet$day, " needs a soft plan"),
+      paste0(
+        wet$day, " carries the wettest odds (~", wmw_fmt_precip(wet$precip), ", ",
+        tolower(wet$short), "). Library (217 N Front — closed Sundays), Dead River on Baraga, ",
+        "or try a downtown place you have not done this season. If blue breaks open, steal a short Fit Strip loop."
+      )
+    )
+  } else if (!is.null(facts$warmest)) {
+    w <- facts$warmest
+    wet <- facts$wettest
+    tasks <- wmw_add_task(
+      tasks,
+      "Mixed week — pick your windows",
+      paste0(
+        "Warmest look: ", w$day, " near ", wmw_fmt_temp(w$temp), ". ",
+        "Wettest look: ", wet$day, " (~", wmw_fmt_precip(wet$precip), "). ",
+        "Outdoor on the kinder days (Presque Isle / Fit Strip / hammock); indoor stretch when it turns."
+      )
     )
   }
 
-  if (month %in% c(6, 7, 8)) {
+  # --- Named warmest day (if not already the pattern lead and it is worth it) ----
+  if (!is.null(facts$warmest) && isTRUE(facts$max_high >= 70) &&
+      !identical(facts$pattern, "nice_then_wet") &&
+      !identical(facts$pattern, "mostly_fair")) {
+    w <- facts$warmest
     tasks <- wmw_add_task(
       tasks,
-      "High-summer outside",
-      "Warm evenings favor shoreline hangs, late hammocks, and easy water-watching. Hardening off transplants and watering still count as outdoor time — apartment version: herbs on a stoop and a dusk walk on the Fit Strip."
+      paste0(w$day, " warmth"),
+      paste0(
+        "Week’s mild peak near ", wmw_fmt_temp(w$temp), " on ", w$day,
+        ". That is the hammock / Tourist Park / Presque Isle sit day. Cooler evenings still count with a blanket and a friend."
+      )
     )
   }
 
-  if (month %in% c(9, 10)) {
+  # --- Named wind day when breezy and not already covered ----------------------
+  if (!is.null(facts$windiest) && isTRUE(facts$max_wind >= 15) &&
+      !identical(facts$pattern, "windy_dry")) {
+    wi <- facts$windiest
+    if (isTRUE(wi$precip < 45)) {
+      tasks <- wmw_add_task(
+        tasks,
+        paste0("Catch the breeze on ", wi$day),
+        paste0(
+          "Winds toward ", wmw_fmt_wind(wi$wind), " on ", wi$day,
+          ". Kite or lake-watch; no kite still works on a Presque Isle bench facing Superior."
+        )
+      )
+    }
+  }
+
+  # --- Wet day indoor when stormy but pattern was not stormy_lurking -----------
+  if (!is.null(facts$wettest) && isTRUE(facts$max_precip >= 50) &&
+      !identical(facts$pattern, "stormy_lurking") &&
+      !identical(facts$pattern, "nice_then_wet") &&
+      !identical(facts$pattern, "wet_then_nice")) {
+    wet <- facts$wettest
     tasks <- wmw_add_task(
       tasks,
-      "Before lake-effect settles in",
-      "Use the soft fall windows: longer Presque Isle sits, kite if it is breezy, blanket + friend while the grass is still kind. Indoors backup: Peter White Library or Dead River when the first lasting cold rain shows up."
+      paste0("Flex day: ", wet$day),
+      paste0(
+        "Precip odds near ", wmw_fmt_precip(wet$precip), " — ", tolower(wet$short),
+        ". Default indoor: Peter White Library or Dead River Coffee. MarqTran to Ishpeming if you want a small adventure."
+      )
     )
   }
 
-  if (month %in% c(11, 12, 1, 2)) {
+  # --- Buck up for approaching winter (late summer through deep fall) ----------
+  if (month %in% c(8, 9, 10, 11)) {
     tasks <- wmw_add_task(
       tasks,
-      "Cold-season outside, short and honest",
-      "Bundle for a brief Presque Isle or Fit Strip blast — face the wind, then thaw at Dead River Coffee. Foul and dark: library chair, leftover soup, window cracked so it still feels like the lake is out there."
+      "Buck up for winter",
+      paste0(
+        "Superior season is turning — get ready before the first lasting lake-effect cycle owns the calendar. ",
+        "Stage scrapers and a warm layer by the door; check heat (furnace, baseboard, or wood); ",
+        "cabin folks: woodpile and roof edges; renters: same idea in apartment scale. ",
+        "Enjoy the mild days, but do not pretend January is optional."
+      )
+    )
+  } else if (month %in% c(12, 1, 2)) {
+    tasks <- wmw_add_task(
+      tasks,
+      "Stay winter-ready",
+      "Deep season: keep traction gear where you can reach it, watch freeze-thaw sidewalks, and thaw at Dead River after a short Presque Isle or Fit Strip blast."
     )
   }
 
-  if (month %in% c(3, 4)) {
+  # --- Light seasonal garnish (no grass; weather still leads) ------------------
+  if (month %in% c(4, 5) && isTRUE(facts$max_high >= 50)) {
     tasks <- wmw_add_task(
       tasks,
-      "Thaw light",
-      "March/April can tease: dry afternoon → shore path or hammock trial run; slick morning → Dead River or Peter White until the peninsula dries. Stretch whatever scrap of blue you get."
+      "Shoulder-season beds",
+      "If soil is workable and hard frost is not in the near term, cool-season starts can go in. No plot? Long Fit Strip walks between showers still count."
     )
   }
 
-  # Climate context without chore framing
+  if (month %in% c(6, 7) && identical(facts$pattern, "mostly_fair")) {
+    tasks <- wmw_add_task(
+      tasks,
+      "High-summer hang",
+      "Long light: shoreline evenings, late hammocks, water-watching from the lower harbor. Apartment version: stoop herbs and a dusk Fit Strip loop."
+    )
+  }
+
   if (!is.null(rolling) && nrow(rolling) > 0) {
     latest <- rolling[which.max(rolling$year * 100 + rolling$month), ]
-    if (!is.na(latest$snow_obs) && !is.na(latest$snow_normal) && latest$snow_obs > latest$snow_normal * 1.2) {
+    if (!is.na(latest$snow_obs) && !is.na(latest$snow_normal) &&
+        latest$snow_obs > latest$snow_normal * 1.2) {
       tasks <- wmw_add_task(
         tasks,
-        "Snow running high",
-        "Recent snowfall is above the 1991–2020 normal. After a dump: short bright walk when it clears, then a warm sit at Dead River or the library. Cabin/roof folks: clear valleys when you can; renters: scraper by the door still counts as readiness."
+        "Snow running high vs normal",
+        "Recent snowfall is above the 1991–2020 normal. After a dump: short bright walk when it clears, then warm up. Keep the scraper honest."
       )
     }
   }
 
-  # Cap length so the briefing stays scannable
-  if (length(tasks) > 6) {
-    # Keep cadence note (if any) + prioritize forecast-driven + midweek + one seasonal
-    tasks <- tasks[seq_len(6)]
+  # Deduplicate titles
+  if (length(tasks) > 1) {
+    titles <- vapply(tasks, function(x) x$title, character(1))
+    tasks <- tasks[!duplicated(titles)]
+  }
+
+  # Cap auto length but never drop manual block
+  n_manual <- length(wmw_manual_monday_tasks)
+  max_total <- n_manual + 5L
+  if (length(tasks) > max_total) {
+    tasks <- tasks[seq_len(max_total)]
   }
 
   if (length(tasks) == 0) {
