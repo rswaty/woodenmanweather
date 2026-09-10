@@ -80,6 +80,12 @@ wmw_monthly_summary <- function(daily) {
   )
   names(tmax_max)[names(tmax_max) == "tmax_f"] <- "tmax_max"
 
+  tmin <- stats::aggregate(
+    tmin_f ~ year + month,
+    data = daily,
+    FUN = function(x) mean(x, na.rm = TRUE),
+    na.action = na.pass
+  )
   tmin_min <- stats::aggregate(
     tmin_f ~ year + month,
     data = daily,
@@ -108,6 +114,7 @@ wmw_monthly_summary <- function(daily) {
   )
 
   monthly <- merge(tmax, tmax_max, by = c("year", "month"))
+  monthly <- merge(monthly, tmin, by = c("year", "month"))
   monthly <- merge(monthly, tmin_min, by = c("year", "month"))
   monthly <- merge(monthly, tavg, by = c("year", "month"))
   monthly <- merge(monthly, prcp, by = c("year", "month"))
@@ -146,9 +153,17 @@ wmw_rolling_year_series <- function(
   monthly <- wmw_monthly_summary(daily)
 
   monthly$month_label <- format(as.Date(paste0("2020-", monthly$month, "-01")), "%b")
-  monthly <- merge(monthly, normals[, c("month", "tmax_f", "tavg_f", "prcp_in", "snow_in")], by = "month", suffixes = c("_obs", "_normal"), all.x = TRUE)
+  monthly <- merge(
+    monthly,
+    normals[, c("month", "tmax_f", "tmin_f", "tavg_f", "prcp_in", "snow_in")],
+    by = "month",
+    suffixes = c("_obs", "_normal"),
+    all.x = TRUE
+  )
   names(monthly)[names(monthly) == "tmax_f_obs"] <- "tmax_obs"
   names(monthly)[names(monthly) == "tmax_f_normal"] <- "tmax_normal"
+  names(monthly)[names(monthly) == "tmin_f_obs"] <- "tmin_obs"
+  names(monthly)[names(monthly) == "tmin_f_normal"] <- "tmin_normal"
   names(monthly)[names(monthly) == "tavg_f_obs"] <- "tavg_obs"
   names(monthly)[names(monthly) == "prcp_in_obs"] <- "prcp_obs"
   names(monthly)[names(monthly) == "snow_in_obs"] <- "snow_obs"

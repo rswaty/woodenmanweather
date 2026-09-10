@@ -34,7 +34,8 @@ wmw_interactive_chart <- function(
   secondary_badge_html <- ""
   chart_subtitle <- ""
   max_vals <- NULL
-  min_vals <- NULL
+  low_obs_vals <- NULL
+  low_norm_vals <- NULL
 
   # Metric specific divergence palettes & calculations
   if (metric == "temperature") {
@@ -44,20 +45,25 @@ wmw_interactive_chart <- function(
     tick_unit <- "°"
     unit_badge <- "°F"
     digits <- 0
-    title <- "Monthly Avg Highs vs. Recent Historical Norms"
-    chart_subtitle <- "Solid line = month average daily high · Diamonds = hottest day of each month"
+    title <- "Monthly Avg Highs & Lows vs. Recent Historical Norms"
+    chart_subtitle <- "Bold = avg highs · Lighter = avg lows · Diamonds = hottest day of each month"
     pos_color <- "#f59e0b"        # warm amber (above normal)
     neg_color <- "#38bdf8"        # crisp slate-cyan (below normal)
 
     obs_vals <- as.numeric(series[[obs_col]])
     norm_vals <- as.numeric(series[[norm_col]])
+    low_obs_vals <- if ("tmin_obs" %in% names(series)) as.numeric(series$tmin_obs) else rep(NA_real_, n_pts)
+    low_norm_vals <- if ("tmin_normal" %in% names(series)) as.numeric(series$tmin_normal) else rep(NA_real_, n_pts)
     max_vals <- if ("tmax_max" %in% names(series)) as.numeric(series$tmax_max) else obs_vals
-    min_vals <- if ("tmin_min" %in% names(series)) as.numeric(series$tmin_min) else rep(NA_real_, n_pts)
 
-    # Today's high in the bubble + rightmost mean point
+    # Today's high/low in the bubble + rightmost mean points
     latest_norm <- norm_vals[n_pts]
     latest_obs <- if (!is.null(today_high) && !is.na(today_high)) as.numeric(today_high) else obs_vals[n_pts]
     obs_vals[n_pts] <- latest_obs
+
+    if (!is.null(today_low) && !is.na(today_low)) {
+      low_obs_vals[n_pts] <- as.numeric(today_low)
+    }
 
     # Current-month hottest day includes today's forecast/obs high when warmer
     if (!is.na(max_vals[n_pts])) {
@@ -83,19 +89,6 @@ wmw_interactive_chart <- function(
         "<div class='wmw-stat-badge'>",
         "<span class='wmw-stat-now-label'>Today's Low:</span>",
         "<span class='wmw-stat-now-value'>", low_str, "</span>",
-        "</div>"
-      )
-    }
-
-    # Show the latest month's hottest observed day (builds trust vs the average line)
-    latest_max <- max_vals[n_pts]
-    if (!is.na(latest_max)) {
-      max_lbl <- paste0(series$month_label[n_pts], " max high:")
-      secondary_badge_html <- paste0(
-        secondary_badge_html,
-        "<div class='wmw-stat-badge'>",
-        "<span class='wmw-stat-now-label'>", max_lbl, "</span>",
-        "<span class='wmw-stat-now-value'>", round(latest_max, 0), " °F</span>",
         "</div>"
       )
     }
@@ -187,8 +180,8 @@ wmw_interactive_chart <- function(
   pad_bottom <- 36
   plot_h <- view_h - pad_top - pad_bottom
 
-  # Y range calculation — include monthly extremes on temperature
-  all_vals <- c(obs_vals, norm_vals, max_vals, min_vals)
+  # Y range calculation — include highs, lows, and hottest-day markers
+  all_vals <- c(obs_vals, norm_vals, max_vals, low_obs_vals, low_norm_vals)
   all_vals <- all_vals[!is.na(all_vals)]
   val_min <- min(all_vals)
   val_max <- max(all_vals)
@@ -210,6 +203,8 @@ wmw_interactive_chart <- function(
 
   y_obs <- vapply(obs_vals, y_scale, numeric(1))
   y_norm <- vapply(norm_vals, y_scale, numeric(1))
+  y_low_obs <- if (!is.null(low_obs_vals)) vapply(low_obs_vals, y_scale, numeric(1)) else NULL
+  y_low_norm <- if (!is.null(low_norm_vals)) vapply(low_norm_vals, y_scale, numeric(1)) else NULL
 
   baseline_y <- view_h - pad_bottom + 4
 
@@ -279,6 +274,8 @@ wmw_interactive_chart <- function(
 
   obs_path <- build_spline_path(x_coords, y_obs)
   norm_path <- build_spline_path(x_coords, y_norm)
+  low_obs_path <- if (!is.null(y_low_obs)) build_spline_path(x_coords, y_low_obs) else NULL
+  low_norm_path <- if (!is.null(y_low_norm)) build_spline_path(x_coords, y_low_norm) else NULL
 
   # Divergence area polygon enclosed strictly between observed and historical curves
   rev_norm_path_pts <- paste0(" L ", rev(round(x_coords, 1)), " ", rev(round(y_norm, 1)), collapse = "")
@@ -298,8 +295,21 @@ wmw_interactive_chart <- function(
   grad_line_str <- paste(grad_stops_line, collapse = "\n")
   grad_area_str <- paste(grad_stops_area, collapse = "\n")
 
+  # Lighter divergence stroke for observed lows
+  low_grad_stops_line <- character(n_pts)
+  if (!is.null(low_obs_vals) && !is.null(low_norm_vals)) {
+    for (i in seq_len(n_pts)) {
+      pct <- round(((x_coords[i] - pad_left_time) / plot_w_time) * 100, 1)
+      is_pos <- !is.na(low_obs_vals[i]) && !is.na(low_norm_vals[i]) && low_obs_vals[i] >= low_norm_vals[i]
+      c <- if (is_pos) pos_color else neg_color
+      low_grad_stops_line[i] <- paste0("<stop offset='", pct, "%' stop-color='", c, "' />")
+    }
+  }
+  low_grad_line_str <- paste(low_grad_stops_line, collapse = "\n")
+
   grad_line_id <- paste0("grad-line-", metric)
   grad_area_id <- paste0("grad-area-", metric)
+  low_grad_line_id <- paste0("grad-low-line-", metric)
 
   # HTML X-axis labels (badge fonts) + SVG tick marks only
   month_ticks_svg <- character(n_pts)
@@ -327,6 +337,33 @@ wmw_interactive_chart <- function(
   curr_x <- round(x_coords[n_pts], 1)
   curr_y <- round(y_obs[n_pts], 1)
   curr_dot_color <- if (obs_vals[n_pts] >= norm_vals[n_pts]) pos_color else neg_color
+  curr_low_y <- if (!is.null(y_low_obs) && !is.na(y_low_obs[n_pts])) round(y_low_obs[n_pts], 1) else NULL
+  curr_low_color <- if (!is.null(low_obs_vals) && !is.null(low_norm_vals) &&
+                        !is.na(low_obs_vals[n_pts]) && !is.na(low_norm_vals[n_pts]) &&
+                        low_obs_vals[n_pts] >= low_norm_vals[n_pts]) pos_color else neg_color
+
+  low_lines_svg <- ""
+  if (!is.null(low_norm_path) && !is.null(low_obs_path)) {
+    low_lines_svg <- paste0(
+"<!-- Historical lows: lighter dashed white -->
+<path d='", low_norm_path, "' stroke='#ffffff' stroke-width='1.6' stroke-dasharray='5 5' opacity='0.42' fill='none' class='wmw-low-normal-line' />
+
+<!-- Observed lows: lighter divergence stroke -->
+<path d='", low_obs_path, "' stroke='url(#", low_grad_line_id, ")' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' opacity='0.55' fill='none' class='wmw-low-obs-line' />
+"
+    )
+  }
+
+  low_grad_def <- if (nzchar(low_grad_line_str)) {
+    paste0(
+"<linearGradient id='", low_grad_line_id, "' x1='0%' y1='0%' x2='100%' y2='0%'>
+", low_grad_line_str, "
+</linearGradient>
+"
+    )
+  } else {
+    ""
+  }
 
   # Build timeline SVG content — fill the box the same in card and expand
   timeline_svg_html <- paste0(
@@ -338,16 +375,17 @@ wmw_interactive_chart <- function(
 <linearGradient id='", grad_area_id, "' x1='0%' y1='0%' x2='100%' y2='0%'>
 ", grad_area_str, "
 </linearGradient>
-</defs>
+", low_grad_def, "</defs>
 <rect x='0' y='0' width='", view_w_timeline, "' height='", view_h, "' class='wmw-bg-rect' />
 
-<!-- Light shading strictly between current observed and historical lines -->
+<!-- Light shading strictly between current observed and historical high lines -->
 <path d='", divergence_area_path, "' fill='url(#", grad_area_id, ")' class='wmw-area-divergence' />
 
-<!-- Historical line: crisp white and slightly wider (stroke-width 2.6) -->
+", low_lines_svg, "
+<!-- Historical highs: crisp white and slightly wider (stroke-width 2.6) -->
 <path d='", norm_path, "' stroke='#ffffff' stroke-width='2.6' stroke-dasharray='6 4' opacity='0.95' fill='none' class='wmw-normal-line' />
 
-<!-- Observed monthly-average line -->
+<!-- Observed monthly-average highs -->
 <path d='", obs_path, "' stroke='url(#", grad_line_id, ")' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round' fill='none' class='wmw-obs-line' />
 
 <!-- X-Axis baseline and month tick marks -->
@@ -363,6 +401,13 @@ wmw_interactive_chart <- function(
     if (!is_latest) {
       timeline_svg_html <- paste0(timeline_svg_html, "
 <circle cx='", round(x_coords[i], 1), "' cy='", round(y_obs[i], 1), "' r='3' fill='", pt_color, "' stroke='#090d13' stroke-width='1.2' class='wmw-dot' />")
+    }
+    if (!is.null(y_low_obs) && !is_latest && !is.na(y_low_obs[i])) {
+      low_pt <- if (!is.null(low_obs_vals) && !is.null(low_norm_vals) &&
+                    !is.na(low_obs_vals[i]) && !is.na(low_norm_vals[i]) &&
+                    low_obs_vals[i] >= low_norm_vals[i]) pos_color else neg_color
+      timeline_svg_html <- paste0(timeline_svg_html, "
+<circle cx='", round(x_coords[i], 1), "' cy='", round(y_low_obs[i], 1), "' r='2.2' fill='", low_pt, "' fill-opacity='0.55' stroke='#090d13' stroke-width='1' class='wmw-low-dot' />")
     }
   }
 
@@ -386,8 +431,16 @@ wmw_interactive_chart <- function(
 <g class='wmw-markers-group'>")
   }
 
+  low_current_dot <- if (!is.null(curr_low_y)) {
+    paste0("
+<circle cx='", curr_x, "' cy='", curr_low_y, "' r='4' fill='", curr_low_color, "' fill-opacity='0.6' stroke='#ffffff' stroke-width='1.5' class='wmw-low-dot-current' />")
+  } else {
+    ""
+  }
+
   timeline_svg_html <- paste0(timeline_svg_html, "
-<circle cx='", curr_x, "' cy='", curr_y, "' r='5.5' fill='", curr_dot_color, "' stroke='#ffffff' stroke-width='2' class='wmw-dot-current' />
+<circle cx='", curr_x, "' cy='", curr_y, "' r='5.5' fill='", curr_dot_color, "' stroke='#ffffff' stroke-width='2' class='wmw-dot-current' />",
+low_current_dot, "
 </g>
 </svg>")
 
@@ -430,18 +483,12 @@ wmw_interactive_chart <- function(
 </div>
 ", secondary_badge_html, "
 </div>
-<div class='wmw-nav-tools'>
-<button type='button' class='wmw-pill-btn active' data-action='zoom-now'>Now</button>
-<button type='button' class='wmw-pill-btn' data-action='zoom-6m'>6M</button>
-<button type='button' class='wmw-pill-btn' data-action='zoom-12m'>12M</button>
-</div>
 </div>
 <script>
 (function() {
   const chartId = '", chart_id, "';
   const viewport = document.getElementById(chartId + '-viewport');
   const canvas = document.getElementById(chartId + '-canvas');
-  const card = document.getElementById(chartId);
 
   if (!viewport || !canvas) return;
 
@@ -470,36 +517,13 @@ wmw_interactive_chart <- function(
     }
   }, { passive: false });
 
-  const zoomBtns = card.querySelectorAll('.wmw-pill-btn');
-  zoomBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      zoomBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const action = btn.dataset.action;
-      if (action === 'zoom-now') {
-        userHasInteracted = false;
-        canvas.style.width = '135%';
-        scrollToEnd();
-      } else if (action === 'zoom-6m') {
-        userHasInteracted = true;
-        canvas.style.width = '115%';
-        requestAnimationFrame(() => {
-          viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-        });
-      } else if (action === 'zoom-12m') {
-        userHasInteracted = true;
-        canvas.style.width = '100%';
-        viewport.scrollLeft = 0;
-      }
-    });
-  });
-
   let isDown = false;
   let startX = 0;
   let scrollLeft = 0;
 
   viewport.addEventListener('mousedown', (e) => {
     isDown = true;
+    userHasInteracted = true;
     viewport.classList.add('grabbing');
     startX = e.pageX - viewport.offsetLeft;
     scrollLeft = viewport.scrollLeft;

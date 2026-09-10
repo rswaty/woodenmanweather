@@ -283,7 +283,7 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
         <span class='wmw-gauge-val'><strong style='color: ", stove$color, ";'>", stove$level, ": ", stove$title, "</strong> <span class='wmw-gauge-sub'>— ", stove$desc, "</span></span>
       </div>
       <div class='wmw-gauge-item'>
-        <span class='wmw-gauge-label'>Daylight Arc</span>
+        <span class='wmw-gauge-label'>Daylight Length</span>
         <span class='wmw-gauge-val'><strong style='color: #ffffff;'>", daylight$length_str, "</strong> <span class='wmw-gauge-sub' style='color: ", daylight_color, "; font-weight: 600;'>&nbsp;(", daylight$change_str, ")</span></span>
       </div>
     </div>
@@ -320,10 +320,6 @@ wmw_card_sidebar_dispatch <- function() {
     </div>
   </div>
 
-  <div class='wmw-op-footer'>
-    <div class='wmw-stat-pill'>Dispatch: <strong>Live</strong></div>
-    <div class='wmw-stat-pill'>Grid: <strong>MQT 153,70</strong></div>
-  </div>
 </div>")
 
   htmltools::HTML(html)
