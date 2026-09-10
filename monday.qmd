@@ -29,9 +29,9 @@ briefing_friday <- briefing_monday + days(4)
 
 Wooden Man Weather publishes a practical outlook each Monday for the Marquette work week. Forecasts come from the National Weather Service; climate context uses NOAA daily summaries for station `r wmw_station_id()`.
 
-**Headline:** `r if (nrow(work_week) > 0) work_week$short_forecast[1] else current$description`
+`r if (nrow(work_week) > 0) work_week$short_forecast[1] else current$description`
 
-**Observation:** `r wmw_format_f(current$temperature_f)` at `r current$station` (`r wmw_format_dt(current$observed_at)`).
+`r wmw_format_f(current$temperature_f)` at `r current$station` (`r wmw_format_dt(current$observed_at)`).
 
 ## Work-week strip
 

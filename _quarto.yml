@@ -16,7 +16,7 @@ website:
       - href: index.qmd
         text: Dashboard
       - href: monday.qmd
-        text: Monday briefing
+        text: Weekly briefing
       - href: about.qmd
         text: About
     right:

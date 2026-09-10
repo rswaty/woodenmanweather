@@ -45,7 +45,7 @@ wmw_interactive_chart <- function(
     tick_unit <- "°"
     unit_badge <- "°F"
     digits <- 0
-    title <- "Monthly Avg Temperatures vs. Recent Historical Norms"
+    title <- "Monthly Avg Temps vs. Recent Historical Norms"
     chart_subtitle <- "Dashed lines = historical · Bold = avg highs · Lighter = avg lows · Diamonds = hottest day of each month"
     pos_color <- "#f59e0b"        # warm amber (above normal)
     neg_color <- "#38bdf8"        # crisp slate-cyan (below normal)
