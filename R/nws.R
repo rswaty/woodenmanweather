@@ -62,6 +62,7 @@ wmw_nws_forecast_periods <- function(context = wmw_nws_context()) {
 }
 
 wmw_nws_work_week <- function(context = wmw_nws_context()) {
+  # Kept for callers; same as Mon–Fri of the current week.
   periods <- wmw_nws_forecast_periods(context)
   periods$start_date <- as.Date(lubridate::ymd_hms(periods$start_time, tz = "UTC"), tz = "America/Detroit")
 
@@ -76,6 +77,21 @@ wmw_nws_work_week <- function(context = wmw_nws_context()) {
     periods,
     start_date >= as.Date(work_week_start) & start_date <= as.Date(work_week_end)
   )
+}
+
+#' Rolling N-day NWS forecast window starting today (America/Detroit).
+wmw_nws_next_days <- function(context = wmw_nws_context(), days = 7) {
+  periods <- wmw_nws_forecast_periods(context)
+  periods$start_date <- as.Date(lubridate::ymd_hms(periods$start_time, tz = "UTC"), tz = "America/Detroit")
+
+  today <- as.Date(lubridate::with_tz(Sys.time(), "America/Detroit"))
+  end_day <- today + lubridate::days(as.integer(days) - 1L)
+
+  out <- subset(
+    periods,
+    start_date >= today & start_date <= end_day
+  )
+  out[order(out$start_time), , drop = FALSE]
 }
 
 wmw_nws_alerts <- function() {

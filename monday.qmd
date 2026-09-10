@@ -1,5 +1,5 @@
 ---
-title: "Monday work-week briefing"
+title: "Weekly outdoor outlook"
 subtitle: "Marquette, Michigan"
 format: html
 ---
@@ -16,34 +16,34 @@ library(lubridate)
 
 nws_context <- wmw_nws_context()
 current <- wmw_nws_current_summary(nws_context)
-work_week <- wmw_nws_work_week(nws_context)
+forecast_7d <- wmw_nws_next_days(nws_context, days = 7)
 rolling <- wmw_rolling_year_series()
-tasks <- wmw_monday_tasks(work_week = work_week, current = current, rolling = rolling)
+tasks <- wmw_monday_tasks(work_week = forecast_7d, current = current, rolling = rolling)
 task_table <- wmw_tasks_dataframe(tasks)
 
-briefing_monday <- floor_date(with_tz(Sys.time(), "America/Detroit"), unit = "week", week_start = 1)
-briefing_friday <- briefing_monday + days(4)
+outlook_start <- as.Date(with_tz(Sys.time(), "America/Detroit"))
+outlook_end <- outlook_start + days(6)
 ```
 
-## Week of `r format(briefing_monday, "%B %d")`–`r format(briefing_friday, "%d, %Y")`
+## `r format(outlook_start, "%B %d")`–`r format(outlook_end, "%d, %Y")`
 
-Wooden Man Weather publishes a practical outdoor outlook each week for Marquette. Forecasts come from the National Weather Service; climate context uses NOAA daily summaries for station `r wmw_station_id()`. Fair days lean toward Presque Isle, the Fit Strip, and slow hangs outside; foul days lean toward Peter White Library, Dead River Coffee, MarqTran, and a new restaurant.
+Wooden Man Weather publishes a practical outdoor outlook for the next seven days in Marquette. Forecasts come from the National Weather Service; climate context uses NOAA daily summaries for station `r wmw_station_id()`. Fair days lean toward Presque Isle, the Fit Strip, and slow hangs outside; foul days lean toward Peter White Library, Dead River Coffee, MarqTran, and a new restaurant.
 
-`r if (nrow(work_week) > 0) work_week$short_forecast[1] else current$description`
+`r if (nrow(forecast_7d) > 0) forecast_7d$short_forecast[1] else current$description`
 
 `r wmw_format_f(current$temperature_f)` at `r current$station` (`r wmw_format_dt(current$observed_at)`).
 
-## Work-week strip
+## Forecast for next 7 days:
 
 ```{r}
-if (nrow(work_week) == 0) {
-  cat("The NWS work-week periods are not available yet. Check the dashboard for the latest forecast.")
+if (nrow(forecast_7d) == 0) {
+  cat("The NWS 7-day periods are not available yet. Check the dashboard for the latest forecast.")
 } else {
   knitr::kable(
-    work_week |>
+    forecast_7d |>
       transmute(
         Day = name,
-        `High (°F)` = ifelse(is_daytime, temperature, NA_real_),
+        `Temp (°F)` = temperature,
         Forecast = short_forecast,
         `Precip %` = probability_of_precipitation,
         Wind = paste(wind_direction, wind_speed)

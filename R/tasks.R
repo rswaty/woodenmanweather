@@ -95,7 +95,7 @@ wmw_monday_tasks <- function(
     tasks <- wmw_add_task(
       tasks,
       "Briefing cadence",
-      "This weekly briefing refreshes for Monday mornings. The outdoor ideas still work any day — check back at the start of the week for a fresh set."
+      "This weekly briefing refreshes often. The outdoor ideas still work any day — the forecast table always covers the next seven days."
     )
   }
 
