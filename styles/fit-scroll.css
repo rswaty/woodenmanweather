@@ -1,9 +1,9 @@
 /*
-  Wooden Man Weather — FIT-SCROLL layout mode (ACTIVE)
+  Wooden Man Weather — FIT-SCROLL layout mode (ACTIVE, moderated)
 
   Goals
-  - Prefer fitting the dashboard in one viewport (no scroll) on common
-    laptop / portable-landscape sizes.
+  - Prefer fitting the dashboard in one viewport on common sizes,
+    without crushing charts/chrome as hard as the first pass.
   - If content still overflows, use ONE page scrollbar.
   - Never use per-card / per-section vertical scrollbars.
 
@@ -44,7 +44,7 @@ body {
 .quarto-dashboard > #quarto-content > .bslib-grid,
 .quarto-dashboard #quarto-content > .bslib-grid {
   height: auto !important;
-  min-height: calc(100vh - 3.25rem) !important; /* try to fill when short */
+  min-height: calc(100vh - 3.25rem) !important;
   align-content: start !important;
 }
 
@@ -101,10 +101,10 @@ body {
   overflow: visible !important;
 }
 
-/* Stable chart plot budget: readable without forcing viewport fill */
+/* Moderated chart budget (~halfway between first fit pass and fill) */
 .wmw-chart-main {
   height: auto !important;
-  min-height: 230px !important;
+  min-height: 280px !important;
   flex: 0 0 auto !important;
   overflow: hidden !important;
 }
@@ -112,67 +112,67 @@ body {
 .wmw-y-axis-pane,
 .wmw-viewport-shell,
 .wmw-viewport {
-  height: 230px !important;
-  min-height: 230px !important;
-  max-height: 230px !important;
+  height: 280px !important;
+  min-height: 280px !important;
+  max-height: 280px !important;
 }
 
 .wmw-plot-frame {
-  height: 200px !important;
-  min-height: 200px !important;
+  height: 248px !important;
+  min-height: 248px !important;
 }
 
 .wmw-x-labels {
-  height: 28px !important;
+  height: 30px !important;
 }
 
-/* Slightly tighter chrome so more viewports fit without scrolling */
+/* Light chrome trim — keep closer to normal spacing */
 .quarto-dashboard.page-layout-custom #quarto-content {
-  padding-top: 0.45rem !important;
-  padding-bottom: 0.55rem !important;
+  padding-top: 0.55rem !important;
+  padding-bottom: 0.65rem !important;
 }
 
 .wmw-outpost-card {
-  padding: 10px 14px 8px 14px !important;
+  padding: 12px 16px 10px 16px !important;
 }
 
 .wmw-chart-card {
-  padding: 8px 12px 6px 10px !important;
+  padding: 10px 14px 8px 12px !important;
 }
 
 .wmw-human-headline,
 .wmw-human-headline.html-fill-item,
 .wmw-human-headline.html-fill-container {
-  font-size: clamp(0.88rem, 1.2vw, 1.05rem) !important;
+  font-size: clamp(0.92rem, 1.3vw, 1.1rem) !important;
 }
 
 .wmw-chart-title {
-  font-size: 0.95rem !important;
+  font-size: 1rem !important;
 }
 
 .wmw-chart-subtitle {
-  font-size: 0.68rem !important;
+  font-size: 0.72rem !important;
 }
 
-/* Short portable / laptop heights: keep one page scroll, never card scroll */
+/* Short portable / laptop heights: modest shrink, still page-scroll only */
 @media (max-height: 820px) {
   .wmw-chart-main,
   .wmw-y-axis-pane,
   .wmw-viewport-shell,
   .wmw-viewport {
-    min-height: 200px !important;
-    height: 200px !important;
-    max-height: 200px !important;
+    min-height: 240px !important;
+    height: 240px !important;
+    max-height: 240px !important;
   }
 
   .wmw-plot-frame {
-    height: 172px !important;
-    min-height: 172px !important;
+    height: 210px !important;
+    min-height: 210px !important;
   }
 
   .wmw-human-sub,
   .wmw-human-sub.html-fill-item,
   .wmw-human-sub.html-fill-container {
-    font-size: 0.72rem !important;
+    font-size: 0.76rem !important;
   }
 }
