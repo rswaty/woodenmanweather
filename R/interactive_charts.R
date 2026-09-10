@@ -403,14 +403,14 @@ wmw_interactive_chart <- function(
     pt_color <- if (obs_vals[i] >= norm_vals[i]) pos_color else neg_color
     if (!is_latest) {
       timeline_svg_html <- paste0(timeline_svg_html, "
-<circle cx='", round(x_coords[i], 1), "' cy='", round(y_obs[i], 1), "' r='5.5' fill='", pt_color, "' stroke='#090d13' stroke-width='1.4' class='wmw-dot' />")
+<circle cx='", round(x_coords[i], 1), "' cy='", round(y_obs[i], 1), "' r='4.6' fill='", pt_color, "' stroke='#090d13' stroke-width='1.3' class='wmw-dot' />")
     }
     if (!is.null(y_low_obs) && !is_latest && !is.na(y_low_obs[i])) {
       low_pt <- if (!is.null(low_obs_vals) && !is.null(low_norm_vals) &&
                     !is.na(low_obs_vals[i]) && !is.na(low_norm_vals[i]) &&
                     low_obs_vals[i] >= low_norm_vals[i]) pos_color else neg_color
       timeline_svg_html <- paste0(timeline_svg_html, "
-<circle cx='", round(x_coords[i], 1), "' cy='", round(y_low_obs[i], 1), "' r='4.2' fill='", low_pt, "' fill-opacity='0.55' stroke='#090d13' stroke-width='1.2' class='wmw-low-dot' />")
+<circle cx='", round(x_coords[i], 1), "' cy='", round(y_low_obs[i], 1), "' r='3.6' fill='", low_pt, "' fill-opacity='0.55' stroke='#090d13' stroke-width='1.1' class='wmw-low-dot' />")
     }
   }
 
@@ -427,7 +427,7 @@ wmw_interactive_chart <- function(
       my_max <- round(y_scale(max_vals[i]), 1)
       timeline_svg_html <- paste0(timeline_svg_html, "
 <line x1='", mx, "' y1='", my_mean, "' x2='", mx, "' y2='", my_max, "' stroke='#f59e0b' stroke-width='1.2' stroke-opacity='0.45' />
-<polygon points='", mx, ",", my_max - 6.5, " ", mx + 6.5, ",", my_max, " ", mx, ",", my_max + 6.5, " ", mx - 6.5, ",", my_max, "' fill='#f59e0b' stroke='#090d13' stroke-width='1.2' class='wmw-max-dot' data-cx='", mx, "' data-cy='", my_max, "' />")
+<polygon points='", mx, ",", my_max - 5.5, " ", mx + 5.5, ",", my_max, " ", mx, ",", my_max + 5.5, " ", mx - 5.5, ",", my_max, "' fill='#f59e0b' stroke='#090d13' stroke-width='1.1' class='wmw-max-dot' data-cx='", mx, "' data-cy='", my_max, "' />")
     }
     timeline_svg_html <- paste0(timeline_svg_html, "
 </g>
@@ -436,13 +436,13 @@ wmw_interactive_chart <- function(
 
   low_current_dot <- if (!is.null(curr_low_y)) {
     paste0("
-<circle cx='", curr_x, "' cy='", curr_low_y, "' r='5.5' fill='", curr_low_color, "' fill-opacity='0.6' stroke='#ffffff' stroke-width='1.6' class='wmw-low-dot-current' />")
+<circle cx='", curr_x, "' cy='", curr_low_y, "' r='4.8' fill='", curr_low_color, "' fill-opacity='0.6' stroke='#ffffff' stroke-width='1.5' class='wmw-low-dot-current' />")
   } else {
     ""
   }
 
   timeline_svg_html <- paste0(timeline_svg_html, "
-<circle cx='", curr_x, "' cy='", curr_y, "' r='7' fill='", curr_dot_color, "' stroke='#ffffff' stroke-width='2' class='wmw-dot-current' />",
+<circle cx='", curr_x, "' cy='", curr_y, "' r='6.2' fill='", curr_dot_color, "' stroke='#ffffff' stroke-width='2' class='wmw-dot-current' />",
 low_current_dot, "
 </g>
 </svg>")
