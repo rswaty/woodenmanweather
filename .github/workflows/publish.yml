@@ -30,6 +30,9 @@ jobs:
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          # Pin to match local renders and avoid Bootstrap CSS hash races
+          version: "1.7.32"
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
@@ -46,16 +49,44 @@ jobs:
           rm -rf _freeze/index
           quarto render
 
+      - name: Verify docs CSS assets match HTML
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re, sys
+          missing = []
+          needed = set()
+          for page in Path("docs").glob("*.html"):
+              text = page.read_text(encoding="utf-8")
+              for rel in re.findall(r'href="(site_libs/[^"]+\.css)"', text):
+                  needed.add(rel)
+          for rel in sorted(needed):
+              path = Path("docs") / rel
+              status = "OK" if path.exists() else "MISSING"
+              print(f"{status} {rel}")
+              if not path.exists():
+                  missing.append(rel)
+          # Drop orphan bootstrap theme CSS not referenced by any page
+          boot = Path("docs/site_libs/bootstrap")
+          if boot.exists():
+              referenced = {Path(r).name for r in needed if "bootstrap/" in r}
+              for css in boot.glob("bootstrap*.min.css"):
+                  if css.name not in referenced and "icons" not in css.name:
+                      print(f"REMOVE orphan {css.name}")
+                      css.unlink()
+          if missing:
+              print("Referenced CSS missing from docs/; refusing to publish broken styles.")
+              sys.exit(1)
+          print("All referenced CSS assets present.")
+          PY
+
       - name: Commit and push updates if changed
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # Always refresh the dashboard stamp path so scheduled runs publish
-          # even when climate caches are unchanged.
-          git add docs/ _freeze/ data/
+          git add -A docs/ _freeze/ data/
           if git diff --staged --quiet; then
             echo "No changes detected to publish."
-            echo "Render outputs were identical to HEAD (unexpected for a fresh stamp)."
           else
             git commit -m "Automated dashboard data update [skip ci]"
             git push
