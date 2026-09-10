@@ -1,0 +1,178 @@
+/*
+  Wooden Man Weather — FIT-SCROLL layout mode (ACTIVE)
+
+  Goals
+  - Prefer fitting the dashboard in one viewport (no scroll) on common
+    laptop / portable-landscape sizes.
+  - If content still overflows, use ONE page scrollbar.
+  - Never use per-card / per-section vertical scrollbars.
+
+  REVERT to the old fill-cockpit (viewport-locked rows, card fill):
+  1. In index.qmd, remove `styles/fit-scroll.css` from the format css list.
+  2. In index.qmd, restore row heights:
+       ### Row {height=40%}
+       ### Row {height=60%}
+  3. Optional: `git revert` the commit that added fit-scroll.
+*/
+
+/* Page may grow; browser owns vertical scrolling */
+html.quarto-dashboard,
+html:has(.quarto-dashboard),
+body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.quarto-dashboard.page-layout-custom,
+.quarto-dashboard .bslib-page-fill,
+.quarto-dashboard #quarto-content.html-fill-container,
+.quarto-dashboard .html-fill-container.bslib-gap-spacing {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+/* Prefer content-sized rows over forced viewport fractions */
+.quarto-dashboard .bslib-grid[style*="grid-template-rows"] {
+  grid-auto-rows: auto !important;
+}
+
+/* Top-level dashboard grids: stretch columns, size rows to content */
+.quarto-dashboard > #quarto-content > .bslib-grid,
+.quarto-dashboard #quarto-content > .bslib-grid {
+  height: auto !important;
+  min-height: calc(100vh - 3.25rem) !important; /* try to fill when short */
+  align-content: start !important;
+}
+
+.quarto-dashboard .bslib-grid > .bslib-grid,
+.quarto-dashboard .bslib-grid > .bslib-grid-item,
+.quarto-dashboard .bslib-grid > .card,
+.quarto-dashboard .bslib-grid > .html-fill-item {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+/* Cards: content height, no inner vertical scroll */
+.quarto-dashboard .bslib-card,
+.quarto-dashboard .card,
+.quarto-dashboard .bslib-card:has(.wmw-chart-card),
+.quarto-dashboard .card:has(.wmw-chart-card) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.quarto-dashboard .bslib-card > .card-body,
+.quarto-dashboard .card > .card-body,
+.quarto-dashboard .bslib-card:has(.wmw-chart-card) > .card-body,
+.quarto-dashboard .card:has(.wmw-chart-card) > .card-body {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.wmw-outpost-card,
+.wmw-outpost-card.html-fill-item,
+.wmw-outpost-card.html-fill-container {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+.wmw-sidebar-card {
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+.wmw-chart-card,
+.wmw-chart-card.html-fill-item,
+.wmw-chart-card.html-fill-container {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Stable chart plot budget: readable without forcing viewport fill */
+.wmw-chart-main {
+  height: auto !important;
+  min-height: 230px !important;
+  flex: 0 0 auto !important;
+  overflow: hidden !important;
+}
+
+.wmw-y-axis-pane,
+.wmw-viewport-shell,
+.wmw-viewport {
+  height: 230px !important;
+  min-height: 230px !important;
+  max-height: 230px !important;
+}
+
+.wmw-plot-frame {
+  height: 200px !important;
+  min-height: 200px !important;
+}
+
+.wmw-x-labels {
+  height: 28px !important;
+}
+
+/* Slightly tighter chrome so more viewports fit without scrolling */
+.quarto-dashboard.page-layout-custom #quarto-content {
+  padding-top: 0.45rem !important;
+  padding-bottom: 0.55rem !important;
+}
+
+.wmw-outpost-card {
+  padding: 10px 14px 8px 14px !important;
+}
+
+.wmw-chart-card {
+  padding: 8px 12px 6px 10px !important;
+}
+
+.wmw-human-headline,
+.wmw-human-headline.html-fill-item,
+.wmw-human-headline.html-fill-container {
+  font-size: clamp(0.88rem, 1.2vw, 1.05rem) !important;
+}
+
+.wmw-chart-title {
+  font-size: 0.95rem !important;
+}
+
+.wmw-chart-subtitle {
+  font-size: 0.68rem !important;
+}
+
+/* Short portable / laptop heights: keep one page scroll, never card scroll */
+@media (max-height: 820px) {
+  .wmw-chart-main,
+  .wmw-y-axis-pane,
+  .wmw-viewport-shell,
+  .wmw-viewport {
+    min-height: 200px !important;
+    height: 200px !important;
+    max-height: 200px !important;
+  }
+
+  .wmw-plot-frame {
+    height: 172px !important;
+    min-height: 172px !important;
+  }
+
+  .wmw-human-sub,
+  .wmw-human-sub.html-fill-item,
+  .wmw-human-sub.html-fill-container {
+    font-size: 0.72rem !important;
+  }
+}

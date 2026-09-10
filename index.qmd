@@ -1,10 +1,15 @@
 ---
 title: "Wooden Man Weather"
 subtitle: "Marquette & the central U.P."
+# Layout: fit-scroll is ON via styles/fit-scroll.css.
+# REVERT fill-cockpit: remove fit-scroll.css from css list below, and restore
+#   ### Row {height=40%} / ### Row {height=60%} on the two main rows.
 format:
   dashboard:
     orientation: columns
-    css: styles/outpost-layout.css
+    css:
+      - styles/outpost-layout.css
+      - styles/fit-scroll.css
 execute:
   freeze: false
 ---
@@ -42,7 +47,7 @@ wmw_card_sidebar_dispatch()
 
 ## Column {width=80%}
 
-### Row {height=40%}
+### Row
 
 #### Global Thermometer
 
@@ -56,7 +61,7 @@ wmw_card_human_thermometer(today_high)
 wmw_card_lake_woodstove(today_high, forecast, context = nws_context)
 ```
 
-### Row {height=60%}
+### Row
 
 #### Temperature
 
