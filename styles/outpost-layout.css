@@ -26,7 +26,7 @@
   overflow: visible !important;
   justify-content: flex-start !important;
   align-items: stretch !important;
-  gap: 8px !important;
+  gap: 6px !important;
 }
 
 .wmw-op-header,
@@ -62,8 +62,8 @@
 .wmw-earth-bar-shell.html-fill-container {
   display: flex !important;
   flex-direction: column !important;
-  gap: 6px !important;
-  margin: 6px 0 2px 0 !important;
+  gap: 4px !important;
+  margin: 4px 0 0 0 !important;
   z-index: 1 !important;
 }
 
@@ -76,7 +76,7 @@
   min-height: 8px !important;
   max-height: 8px !important;
   flex: 0 0 auto !important;
-  margin: 10px 0 6px 0 !important;
+  margin: 6px 0 4px 0 !important;
   overflow: visible !important;
 }
 
@@ -143,8 +143,16 @@
   display: flex !important;
   flex-wrap: wrap !important;
   justify-content: flex-start !important;
-  gap: 6px !important;
+  gap: 5px !important;
   margin-top: auto !important;
+  padding-top: 6px !important;
+}
+
+.wmw-outpost-card:not(.wmw-sidebar-card) > .wmw-op-footer {
+  margin-top: 6px !important;
+  flex-wrap: nowrap !important;
+  gap: 4px !important;
+  overflow-x: auto !important;
 }
 
 .wmw-stat-pill,
@@ -153,6 +161,8 @@
   flex: 0 1 auto !important;
   height: auto !important;
   white-space: nowrap !important;
+  padding: 2px 7px !important;
+  font-size: 0.66rem !important;
 }
 
 .wmw-gauge-list,
@@ -160,7 +170,7 @@
 .wmw-gauge-list.html-fill-container {
   display: flex !important;
   flex-direction: column !important;
-  gap: 6px !important;
+  gap: 4px !important;
   justify-content: flex-start !important;
   height: auto !important;
 }
@@ -171,11 +181,11 @@
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  gap: 2px !important;
+  gap: 1px !important;
   flex: 0 0 auto !important;
   height: auto !important;
   min-height: auto !important;
-  padding: 6px 10px !important;
+  padding: 4px 8px !important;
 }
 
 .wmw-gauge-label {

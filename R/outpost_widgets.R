@@ -241,9 +241,9 @@ wmw_card_human_thermometer <- function(today_high) {
     </div>
   </div>
   <div class='wmw-op-footer'>
-    <div class='wmw-stat-pill'>Global Median: <strong>", ht$global_median, "°F</strong></div>
-    <div class='wmw-stat-pill'>Coldest: <strong>-62°F (Vostok)</strong></div>
-    <div class='wmw-stat-pill'>Warmest: <strong>114°F (Kuwait)</strong></div>
+    <div class='wmw-stat-pill'>Median <strong>", ht$global_median, "°F</strong></div>
+    <div class='wmw-stat-pill'>Coldest <strong>-62°F Vostok</strong></div>
+    <div class='wmw-stat-pill'>Warmest <strong>114°F Kuwait</strong></div>
   </div>
 </div>")
 
