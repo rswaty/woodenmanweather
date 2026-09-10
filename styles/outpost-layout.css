@@ -96,6 +96,26 @@
   z-index: 2 !important;
 }
 
+.wmw-earth-bar-median,
+.wmw-earth-bar-median.html-fill-item,
+.wmw-earth-bar-median.html-fill-container {
+  display: block !important;
+  position: absolute !important;
+  top: 50% !important;
+  width: 3px !important;
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  border-radius: 1px !important;
+  background: #f8fafc !important;
+  box-shadow: 0 0 0 1px rgba(9, 13, 19, 0.85), 0 0 6px rgba(0, 0, 0, 0.55) !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 1 !important;
+  flex: none !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+
 .wmw-earth-bar-labels,
 .wmw-earth-bar-labels.html-fill-item,
 .wmw-earth-bar-labels.html-fill-container {

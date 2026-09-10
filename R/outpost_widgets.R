@@ -216,6 +216,8 @@ wmw_card_human_thermometer <- function(today_high) {
 
   # Scale bar position (clamped 4% to 96% for pin visibility)
   pin_pct <- max(4, min(96, ht$percentile))
+  # Global median sits at the 50th percentile of the human distribution
+  median_pct <- 50
 
   html <- paste0(
 "<div class='wmw-outpost-card'>
@@ -228,6 +230,7 @@ wmw_card_human_thermometer <- function(today_high) {
     
     <div class='wmw-earth-bar-shell'>
       <div class='wmw-earth-bar-track'>
+        <div class='wmw-earth-bar-median' style='left: ", median_pct, "%;' title='Global Median ", ht$global_median, "°F'></div>
         <div class='wmw-earth-bar-pin' style='left: ", pin_pct, "%; border-color: ", accent_color, ";'></div>
       </div>
       <div class='wmw-earth-bar-labels'>
@@ -238,7 +241,6 @@ wmw_card_human_thermometer <- function(today_high) {
     </div>
   </div>
   <div class='wmw-op-footer'>
-    <div class='wmw-stat-pill'>Marquette High: <strong>", ht$local_temp, "°F</strong></div>
     <div class='wmw-stat-pill'>Global Median: <strong>", ht$global_median, "°F</strong></div>
     <div class='wmw-stat-pill'>Coldest: <strong>-62°F (Vostok)</strong></div>
     <div class='wmw-stat-pill'>Warmest: <strong>114°F (Kuwait)</strong></div>
