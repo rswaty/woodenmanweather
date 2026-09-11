@@ -2,6 +2,8 @@
 title: "Weekly outdoor outlook"
 subtitle: "Marquette, Michigan"
 format: html
+execute:
+  freeze: false
 ---
 
 ```{r}

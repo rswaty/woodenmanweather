@@ -47,7 +47,8 @@ jobs:
 
       - name: Render dashboard
         run: |
-          rm -rf _freeze/index
+          # Always refresh live-data pages (index + weekly); never reuse frozen NWS/climate.
+          rm -rf _freeze/index _freeze/monday
           quarto render
 
       - name: Verify docs CSS assets match HTML
