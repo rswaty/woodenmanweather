@@ -4,6 +4,7 @@
   Goals
   - Prefer fitting the dashboard in one viewport on common sizes,
     without crushing charts/chrome as hard as the first pass.
+  - Content-sized rows/cards (no viewport fill, no fr-row stretch).
   - If content still overflows, use ONE page scrollbar.
   - Never use per-card / per-section vertical scrollbars.
 
@@ -35,17 +36,25 @@ body {
   overflow: visible !important;
 }
 
-/* Prefer content-sized rows over forced viewport fractions */
-.quarto-dashboard .bslib-grid[style*="grid-template-rows"] {
-  grid-auto-rows: auto !important;
+/* Prefer content-sized rows — kill Quarto fr-track stretch */
+.quarto-dashboard .bslib-grid {
+  align-content: start !important;
+  align-items: start !important;
+  grid-auto-rows: max-content !important;
 }
 
-/* Top-level dashboard grids: stretch columns, size rows to content */
+.quarto-dashboard .bslib-grid[style*="grid-template-rows"] {
+  grid-template-rows: none !important;
+  grid-auto-rows: max-content !important;
+}
+
+/* Top-level dashboard grids: content height only (no viewport fill) */
 .quarto-dashboard > #quarto-content > .bslib-grid,
 .quarto-dashboard #quarto-content > .bslib-grid {
   height: auto !important;
-  min-height: calc(100vh - 3.25rem) !important;
+  min-height: 0 !important;
   align-content: start !important;
+  align-items: start !important;
 }
 
 .quarto-dashboard .bslib-grid > .bslib-grid,
@@ -55,6 +64,7 @@ body {
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
+  align-self: start !important;
   overflow: visible !important;
 }
 
@@ -89,7 +99,7 @@ body {
 
 .wmw-sidebar-card {
   height: auto !important;
-  min-height: 100% !important;
+  min-height: 0 !important;
 }
 
 .wmw-chart-card,
