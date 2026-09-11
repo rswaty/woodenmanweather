@@ -5,6 +5,7 @@
 .wmw-outpost-card.html-fill-item,
 .wmw-outpost-card.html-fill-container {
   justify-content: flex-start !important;
+  height: auto !important;
   min-height: 0 !important;
   overflow-x: hidden !important;
   overflow-y: visible !important;
@@ -21,7 +22,7 @@
 
 .wmw-outpost-card > .wmw-op-body.html-fill-item,
 .wmw-outpost-card > .wmw-op-body.html-fill-container {
-  flex: 1 1 auto !important;
+  flex: 0 0 auto !important;
   min-height: 0 !important;
   overflow: visible !important;
   justify-content: flex-start !important;

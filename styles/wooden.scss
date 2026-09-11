@@ -96,6 +96,17 @@ body {
   background: #090d13 !important;
 }
 
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card),
+.quarto-dashboard .card:has(.wmw-outpost-card),
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card) > .card-body,
+.quarto-dashboard .card:has(.wmw-outpost-card) > .card-body {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+}
+
 .quarto-dashboard table {
   font-variant-numeric: tabular-nums;
 }
@@ -113,7 +124,7 @@ body {
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
-  height: 100% !important;
+  height: auto !important;
   min-height: 0 !important;
   box-sizing: border-box !important;
   font-family: "Nirmala UI", "Nirmala", sans-serif !important;
@@ -136,7 +147,7 @@ body {
 
 .wmw-outpost-card > .wmw-op-body.html-fill-item,
 .wmw-outpost-card > .wmw-op-body.html-fill-container {
-  flex: 1 1 auto !important;
+  flex: 0 0 auto !important;
   min-height: 0 !important;
   overflow: visible !important;
 }
@@ -178,7 +189,7 @@ body {
 .wmw-op-body,
 .wmw-op-body.html-fill-item,
 .wmw-op-body.html-fill-container {
-  flex: 1 1 auto !important;
+  flex: 0 0 auto !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
@@ -482,7 +493,7 @@ p.wmw-human-sub strong,
    ========================================================================== */
 
 .wmw-sidebar-card {
-  height: 100% !important;
+  height: auto !important;
 }
 
 .wmw-sidebar-card .wmw-op-footer,

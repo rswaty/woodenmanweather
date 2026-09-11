@@ -72,19 +72,27 @@ body {
 .quarto-dashboard .bslib-card,
 .quarto-dashboard .card,
 .quarto-dashboard .bslib-card:has(.wmw-chart-card),
-.quarto-dashboard .card:has(.wmw-chart-card) {
+.quarto-dashboard .card:has(.wmw-chart-card),
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card),
+.quarto-dashboard .card:has(.wmw-outpost-card) {
   height: auto !important;
   max-height: none !important;
+  min-height: 0 !important;
   overflow: visible !important;
+  align-self: start !important;
 }
 
 .quarto-dashboard .bslib-card > .card-body,
 .quarto-dashboard .card > .card-body,
 .quarto-dashboard .bslib-card:has(.wmw-chart-card) > .card-body,
-.quarto-dashboard .card:has(.wmw-chart-card) > .card-body {
+.quarto-dashboard .card:has(.wmw-chart-card) > .card-body,
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card) > .card-body,
+.quarto-dashboard .card:has(.wmw-outpost-card) > .card-body {
   height: auto !important;
   max-height: none !important;
+  min-height: 0 !important;
   overflow: visible !important;
+  flex: 0 0 auto !important;
 }
 
 .wmw-outpost-card,
@@ -93,8 +101,15 @@ body {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
+  flex: 0 0 auto !important;
   overflow-x: hidden !important;
   overflow-y: visible !important;
+}
+
+.wmw-outpost-card > .wmw-op-body,
+.wmw-outpost-card > .wmw-op-body.html-fill-item,
+.wmw-outpost-card > .wmw-op-body.html-fill-container {
+  flex: 0 0 auto !important;
 }
 
 .wmw-sidebar-card {
