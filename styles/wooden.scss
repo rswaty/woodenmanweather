@@ -511,6 +511,22 @@ p.wmw-human-sub strong,
   line-height: 1.35 !important;
 }
 
+.wmw-update-note,
+.wmw-update-note.html-fill-item,
+.wmw-update-note.html-fill-container {
+  display: block !important;
+  flex: 0 0 auto !important;
+  margin: 2px 0 0 0 !important;
+  padding: 0 2px !important;
+  font-size: 0.62rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  color: #64748b !important;
+  line-height: 1.3 !important;
+  height: auto !important;
+  white-space: normal !important;
+}
+
 .wmw-logo-box {
   background: #0b111a !important;
   border: 1px dashed rgba(56, 189, 248, 0.35) !important;

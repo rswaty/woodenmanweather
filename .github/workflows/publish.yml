@@ -3,8 +3,9 @@ name: Update & Publish Dashboard
 on:
   workflow_dispatch:
   schedule:
-    # GitHub cron is UTC. These fire ~5:05 AM and ~5:05 PM US Eastern during EDT
-    # (UTC−4). During EST (UTC−5) that is ~4:05 AM/PM — closest stable pair.
+    # ~5:05 AM and ~5:05 PM America/Detroit during EDT (UTC−4).
+    # During EST (UTC−5) these land ~4:05 AM/PM — closest single UTC pair.
+    # GitHub cron can lag by minutes–hours; stamp shows actual render time.
     - cron: "5 9,21 * * *"
   push:
     branches: [main]

@@ -322,6 +322,7 @@ wmw_card_sidebar_dispatch <- function() {
   <div class='wmw-op-footer wmw-sidebar-footer'>
     <div class='wmw-stat-pill'>Last Updated: <strong>", update_str, "</strong></div>
     <div class='wmw-stat-pill'>Station: <strong>Marquette 46.54°N</strong></div>
+    <div class='wmw-update-note'>Forecast auto-updates at 5am / 5pm</div>
   </div>
 </div>")
 
