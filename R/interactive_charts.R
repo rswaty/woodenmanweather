@@ -17,7 +17,9 @@ wmw_interactive_chart <- function(
   chart_id = NULL,
   today_high = NULL,
   today_low = NULL,
-  month_total = NULL
+  month_total = NULL,
+  recent_obs = NULL,
+  recent_norm = NULL
 ) {
   metric <- match.arg(metric)
   if (is.null(chart_id)) {
@@ -109,9 +111,17 @@ wmw_interactive_chart <- function(
     obs_vals <- as.numeric(series$prcp_obs)
     norm_vals <- as.numeric(series$prcp_normal)
 
-    # Current calendar month (rightmost point) vs that month's normal
-    latest_obs <- obs_vals[n_pts]
-    latest_norm <- norm_vals[n_pts]
+    # Last 30 days observed vs estimated 30-day normal (honest mid-month compare)
+    latest_obs <- if (!is.null(recent_obs) && !is.na(recent_obs)) {
+      as.numeric(recent_obs)
+    } else {
+      obs_vals[n_pts]
+    }
+    latest_norm <- if (!is.null(recent_norm) && !is.na(recent_norm)) {
+      as.numeric(recent_norm)
+    } else {
+      norm_vals[n_pts]
+    }
     latest_diff <- latest_obs - latest_norm
 
     diff_rounded <- round(latest_diff, digits)
@@ -120,8 +130,8 @@ wmw_interactive_chart <- function(
     diff_str <- paste0(diff_sign, format(diff_rounded, nsmall = digits), " in")
     latest_obs_str <- paste0(format(round(latest_obs, digits), nsmall = digits), " in")
 
-    stat_label <- "This Month:"
-    diff_context <- "vs. recent normal"
+    stat_label <- "Last 30 Days:"
+    diff_context <- "vs. 30-day normal"
     curr_color <- if (is.na(latest_diff) || latest_diff >= 0) pos_color else neg_color
 
     # Keep 12-month context as the secondary badge
@@ -154,9 +164,16 @@ wmw_interactive_chart <- function(
     obs_vals <- as.numeric(series$snow_obs)
     norm_vals <- as.numeric(series$snow_normal)
 
-    # Current calendar month (rightmost point) vs that month's normal
-    latest_obs <- obs_vals[n_pts]
-    latest_norm <- norm_vals[n_pts]
+    latest_obs <- if (!is.null(recent_obs) && !is.na(recent_obs)) {
+      as.numeric(recent_obs)
+    } else {
+      obs_vals[n_pts]
+    }
+    latest_norm <- if (!is.null(recent_norm) && !is.na(recent_norm)) {
+      as.numeric(recent_norm)
+    } else {
+      norm_vals[n_pts]
+    }
     latest_diff <- latest_obs - latest_norm
 
     diff_rounded <- round(latest_diff, digits)
@@ -165,8 +182,8 @@ wmw_interactive_chart <- function(
     diff_str <- paste0(diff_sign, format(diff_rounded, nsmall = digits), " in")
     latest_obs_str <- paste0(format(round(latest_obs, digits), nsmall = digits), " in")
 
-    stat_label <- "This Month:"
-    diff_context <- "vs. recent normal"
+    stat_label <- "Last 30 Days:"
+    diff_context <- "vs. 30-day normal"
     curr_color <- if (is.na(latest_diff) || latest_diff >= 0) pos_color else neg_color
 
     cum_obs <- sum(obs_vals, na.rm = TRUE)

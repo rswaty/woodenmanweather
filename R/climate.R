@@ -183,13 +183,32 @@ wmw_rolling_year_series <- function(
   monthly
 }
 
-#' Rolling last-30-day precip and snowfall totals from daily cache / NCEI
-wmw_last_30d_totals <- function(
+#' Rolling last-30-day precip/snow observed totals vs estimated 30-day normals.
+#'
+#' Normals are built from NOAA 1991–2020 monthly normals by allocating each
+#' day's share as (month_normal / days_in_month) over the last 30 calendar days.
+wmw_last_30d_vs_normal <- function(
   end_date = Sys.Date(),
-  station = wmw_station_id()
+  station = wmw_station_id(),
+  normals = NULL
 ) {
+  end_date <- as.Date(end_date)
   start_date <- end_date - 29
   daily_cache <- file.path("data", "climate_daily.csv")
+  normals_cache <- file.path("data", "climate_normals.csv")
+
+  if (is.null(normals)) {
+    if (file.exists(normals_cache)) {
+      normals <- readr::read_csv(normals_cache, show_col_types = FALSE)
+      if (!"prcp_in" %in% names(normals)) {
+        normals <- wmw_ncei_monthly_normals(station)
+        readr::write_csv(normals, normals_cache)
+      }
+    } else {
+      normals <- wmw_ncei_monthly_normals(station)
+      readr::write_csv(normals, normals_cache)
+    }
+  }
 
   daily <- if (file.exists(daily_cache) && file.size(daily_cache) > 0) {
     readr::read_csv(daily_cache, show_col_types = FALSE)
@@ -198,17 +217,48 @@ wmw_last_30d_totals <- function(
   }
 
   if (!"date" %in% names(daily) || nrow(daily) == 0) {
-    return(list(prcp_in = 0, snow_in = 0, n_days = 0L))
+    return(list(
+      prcp_in = 0, prcp_normal = 0,
+      snow_in = 0, snow_normal = 0,
+      n_days = 0L
+    ))
   }
 
   daily$date <- as.Date(daily$date)
   recent <- daily[daily$date >= start_date & daily$date <= end_date, , drop = FALSE]
 
+  day_seq <- seq(start_date, end_date, by = "day")
+  y <- as.integer(format(day_seq, "%Y"))
+  m <- as.integer(format(day_seq, "%m"))
+  next_month <- ifelse(m == 12L, 1L, m + 1L)
+  next_year <- ifelse(m == 12L, y + 1L, y)
+  month_start <- as.Date(sprintf("%04d-%02d-01", y, m))
+  next_start <- as.Date(sprintf("%04d-%02d-01", next_year, next_month))
+  days_in_month <- as.integer(next_start - month_start)
+
+  prcp_by_month <- setNames(wmw_as_numeric(normals$prcp_in), as.character(as.integer(normals$month)))
+  snow_by_month <- setNames(wmw_as_numeric(normals$snow_in), as.character(as.integer(normals$month)))
+  month_keys <- as.character(m)
+
+  prcp_normal <- sum(prcp_by_month[month_keys] / days_in_month, na.rm = TRUE)
+  snow_normal <- sum(snow_by_month[month_keys] / days_in_month, na.rm = TRUE)
+
   list(
     prcp_in = sum(wmw_as_numeric(recent$prcp_in), na.rm = TRUE),
+    prcp_normal = as.numeric(prcp_normal),
     snow_in = sum(wmw_as_numeric(recent$snow_in), na.rm = TRUE),
-    n_days = nrow(recent)
+    snow_normal = as.numeric(snow_normal),
+    n_days = length(day_seq)
   )
+}
+
+#' Rolling last-30-day precip and snowfall totals from daily cache / NCEI
+wmw_last_30d_totals <- function(
+  end_date = Sys.Date(),
+  station = wmw_station_id()
+) {
+  x <- wmw_last_30d_vs_normal(end_date = end_date, station = station)
+  list(prcp_in = x$prcp_in, snow_in = x$snow_in, n_days = x$n_days)
 }
 
 wmw_plot_rolling_metric <- function(series, obs_col, normal_col, title, ylab) {
