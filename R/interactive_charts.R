@@ -45,7 +45,7 @@ wmw_interactive_chart <- function(
     tick_unit <- "°"
     unit_badge <- "°F"
     digits <- 0
-    title <- "Monthly Avg Temps vs. Recent Historical Norms"
+    title <- "Current Monthly Temps vs. Recent Norms"
     chart_subtitle <- paste0(
       "Dashed lines = historical · Bold = avg highs · Lighter = avg lows",
       "<span class='wmw-chart-subtitle-line'>Diamonds = hottest day of each month this year</span>"
@@ -101,7 +101,7 @@ wmw_interactive_chart <- function(
     tick_unit <- " in"
     unit_badge <- "in"
     digits <- 1                    # exactly one tenth
-    title <- "Precipitation vs. Recent Historical Norms"
+    title <- "Current Monthly Precip vs Recent Norms"
     pos_color <- "#10b981"        # crisp emerald (wetter than normal)
     neg_color <- "#f59e0b"        # warm golden-amber (drier than normal)
 
@@ -109,38 +109,44 @@ wmw_interactive_chart <- function(
     obs_vals <- as.numeric(series$prcp_obs)
     norm_vals <- as.numeric(series$prcp_normal)
 
-    # Cumulative 12-month totals for bottom summary bubble
-    cum_obs <- sum(obs_vals, na.rm = TRUE)
-    cum_norm <- sum(norm_vals, na.rm = TRUE)
-    cum_diff <- cum_obs - cum_norm
+    # Current calendar month (rightmost point) vs that month's normal
+    latest_obs <- obs_vals[n_pts]
+    latest_norm <- norm_vals[n_pts]
+    latest_diff <- latest_obs - latest_norm
 
-    diff_rounded <- round(cum_diff, digits)
+    diff_rounded <- round(latest_diff, digits)
     if (abs(diff_rounded) == 0) diff_rounded <- 0
     diff_sign <- if (diff_rounded > 0) "+" else ""
     diff_str <- paste0(diff_sign, format(diff_rounded, nsmall = digits), " in")
-    latest_obs_str <- paste0(format(round(cum_obs, digits), nsmall = digits), " in")
+    latest_obs_str <- paste0(format(round(latest_obs, digits), nsmall = digits), " in")
 
-    stat_label <- "12-Mo Total:"
+    stat_label <- "This Month:"
     diff_context <- "vs. recent normal"
-    curr_color <- if (cum_diff >= 0) pos_color else neg_color
+    curr_color <- if (is.na(latest_diff) || latest_diff >= 0) pos_color else neg_color
 
-    if (!is.null(month_total) && !is.na(month_total)) {
-      mo_str <- paste0(format(round(as.numeric(month_total), digits), nsmall = digits), " in")
-      secondary_badge_html <- paste0(
-        "<div class='wmw-stat-badge'>",
-        "<span class='wmw-stat-now-label'>1-Mo Total:</span>",
-        "<span class='wmw-stat-now-value'>", mo_str, "</span>",
-        "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(last 30 days)</span>",
-        "</div>"
-      )
-    }
+    # Keep 12-month context as the secondary badge
+    cum_obs <- sum(obs_vals, na.rm = TRUE)
+    cum_norm <- sum(norm_vals, na.rm = TRUE)
+    cum_diff <- cum_obs - cum_norm
+    cum_rounded <- round(cum_diff, digits)
+    if (abs(cum_rounded) == 0) cum_rounded <- 0
+    cum_sign <- if (cum_rounded > 0) "+" else ""
+    cum_diff_str <- paste0(cum_sign, format(cum_rounded, nsmall = digits), " in")
+    cum_obs_str <- paste0(format(round(cum_obs, digits), nsmall = digits), " in")
+    secondary_badge_html <- paste0(
+      "<div class='wmw-stat-badge'>",
+      "<span class='wmw-stat-now-label'>12-Mo Total:</span>",
+      "<span class='wmw-stat-now-value'>", cum_obs_str, "</span>",
+      "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(", cum_diff_str, " vs. normal)</span>",
+      "</div>"
+    )
 
   } else { # snowfall
     unit <- "in"
     tick_unit <- " in"
     unit_badge <- "in"
     digits <- 0
-    title <- "Snowfall vs. Recent Historical Norms"
+    title <- "Current Monthly Snowfall vs Recent Norms"
     pos_color <- "#a78bfa"        # soft violet lavender (above normal)
     neg_color <- "#818cf8"        # soft periwinkle slate (below normal)
 
@@ -148,31 +154,36 @@ wmw_interactive_chart <- function(
     obs_vals <- as.numeric(series$snow_obs)
     norm_vals <- as.numeric(series$snow_normal)
 
-    # Cumulative 12-month totals for bottom summary bubble
-    cum_obs <- sum(obs_vals, na.rm = TRUE)
-    cum_norm <- sum(norm_vals, na.rm = TRUE)
-    cum_diff <- cum_obs - cum_norm
+    # Current calendar month (rightmost point) vs that month's normal
+    latest_obs <- obs_vals[n_pts]
+    latest_norm <- norm_vals[n_pts]
+    latest_diff <- latest_obs - latest_norm
 
-    diff_rounded <- round(cum_diff, digits)
+    diff_rounded <- round(latest_diff, digits)
     if (abs(diff_rounded) == 0) diff_rounded <- 0
     diff_sign <- if (diff_rounded > 0) "+" else ""
     diff_str <- paste0(diff_sign, format(diff_rounded, nsmall = digits), " in")
-    latest_obs_str <- paste0(format(round(cum_obs, digits), nsmall = digits), " in")
+    latest_obs_str <- paste0(format(round(latest_obs, digits), nsmall = digits), " in")
 
-    stat_label <- "12-Mo Total:"
+    stat_label <- "This Month:"
     diff_context <- "vs. recent normal"
-    curr_color <- if (cum_diff >= 0) pos_color else neg_color
+    curr_color <- if (is.na(latest_diff) || latest_diff >= 0) pos_color else neg_color
 
-    if (!is.null(month_total) && !is.na(month_total)) {
-      mo_str <- paste0(round(as.numeric(month_total), digits), " in")
-      secondary_badge_html <- paste0(
-        "<div class='wmw-stat-badge'>",
-        "<span class='wmw-stat-now-label'>1-Mo Total:</span>",
-        "<span class='wmw-stat-now-value'>", mo_str, "</span>",
-        "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(last 30 days)</span>",
-        "</div>"
-      )
-    }
+    cum_obs <- sum(obs_vals, na.rm = TRUE)
+    cum_norm <- sum(norm_vals, na.rm = TRUE)
+    cum_diff <- cum_obs - cum_norm
+    cum_rounded <- round(cum_diff, digits)
+    if (abs(cum_rounded) == 0) cum_rounded <- 0
+    cum_sign <- if (cum_rounded > 0) "+" else ""
+    cum_diff_str <- paste0(cum_sign, format(cum_rounded, nsmall = digits), " in")
+    cum_obs_str <- paste0(format(round(cum_obs, digits), nsmall = digits), " in")
+    secondary_badge_html <- paste0(
+      "<div class='wmw-stat-badge'>",
+      "<span class='wmw-stat-now-label'>12-Mo Total:</span>",
+      "<span class='wmw-stat-now-value'>", cum_obs_str, "</span>",
+      "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(", cum_diff_str, " vs. normal)</span>",
+      "</div>"
+    )
   }
 
   # Canvas coordinate space:

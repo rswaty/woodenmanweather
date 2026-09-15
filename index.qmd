@@ -29,7 +29,6 @@ library(scales)
 nws_context <- wmw_nws_context()
 forecast <- wmw_nws_forecast_periods(nws_context)
 rolling <- wmw_rolling_year_series()
-totals_30d <- wmw_last_30d_totals()
 
 today_period <- forecast[forecast$is_daytime, ]
 night_period <- forecast[!forecast$is_daytime, ]
@@ -72,11 +71,11 @@ wmw_interactive_chart(rolling, "temperature", today_high = today_high, today_low
 #### Precipitation
 
 ```{r}
-wmw_interactive_chart(rolling, "precipitation", month_total = totals_30d$prcp_in)
+wmw_interactive_chart(rolling, "precipitation")
 ```
 
 #### Snowfall
 
 ```{r}
-wmw_interactive_chart(rolling, "snowfall", month_total = totals_30d$snow_in)
+wmw_interactive_chart(rolling, "snowfall")
 ```
