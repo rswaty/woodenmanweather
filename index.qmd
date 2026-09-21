@@ -42,7 +42,13 @@ today_low <- if (nrow(night_period) > 0) night_period$temperature[1] else NA_rea
 ### Outpost Notes & Logo
 
 ```{r}
-wmw_card_sidebar_dispatch()
+# --- EDIT LEFT-COLUMN DISPATCH TEXT HERE ---
+dispatch_blurbs <- c(
+  'Superior does not do subtle. A sunny morning can turn into horizontal lake-effect by lunch, and the only honest forecast is "bring a hat you are not emotionally attached to."',
+  'In the U.P. we measure seasons in layers: one for the hike, one for the parking lot wind, and one for the moment you realize Sawyer was lying about "just a dusting."'
+)
+
+wmw_card_sidebar_dispatch(blurbs = dispatch_blurbs)
 ```
 
 ## Column {width=80%}

@@ -295,8 +295,22 @@ wmw_card_lake_woodstove <- function(today_high, forecast_df, date = Sys.Date(),
 }
 
 #' CARD 3: Left Column Logo Placeholder Widget
-wmw_card_sidebar_dispatch <- function() {
+#' @param blurbs Character vector of short dispatch paragraphs (edited in index.qmd).
+wmw_card_sidebar_dispatch <- function(blurbs = character()) {
   update_str <- wmw_format_updated_stamp()
+
+  blurb_html <- ""
+  if (length(blurbs) > 0) {
+    blurbs <- blurbs[!is.na(blurbs) & nzchar(trimws(blurbs))]
+    if (length(blurbs) > 0) {
+      blurb_html <- paste0(
+        "<div class='wmw-dispatch-blurb'>",
+        htmltools::htmlEscape(blurbs),
+        "</div>",
+        collapse = "\n    "
+      )
+    }
+  }
 
   html <- paste0(
 "<div class='wmw-outpost-card wmw-sidebar-card'>
@@ -323,12 +337,7 @@ wmw_card_sidebar_dispatch <- function() {
     <div class='wmw-stat-pill'>Last Updated: <strong>", update_str, "</strong></div>
     <div class='wmw-stat-pill'>Station: <strong>Marquette 46.54°N</strong></div>
     <div class='wmw-update-note'>Forecast auto-updates ~5am / 5pm Eastern</div>
-    <div class='wmw-dispatch-blurb'>
-      Superior does not do subtle. A sunny morning can turn into horizontal lake-effect by lunch, and the only honest forecast is \"bring a hat you are not emotionally attached to.\"
-    </div>
-    <div class='wmw-dispatch-blurb'>
-      In the U.P. we measure seasons in layers: one for the hike, one for the parking lot wind, and one for the moment you realize Sawyer was lying about \"just a dusting.\"
-    </div>
+    ", blurb_html, "
   </div>
 </div>")
 
