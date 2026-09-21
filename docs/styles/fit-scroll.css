@@ -68,30 +68,41 @@ body {
   overflow: visible !important;
 }
 
-/* Peer cards in a row: equal height (thermometer ↔ lake, temp ↔ precip ↔ snow) */
+/* Peer equal-height: Quarto wraps each card in a nested .bslib-grid */
+.quarto-dashboard .bslib-grid:has(> .bslib-grid .wmw-chart-card),
+.quarto-dashboard .bslib-grid:has(> .bslib-grid .wmw-outpost-card:not(.wmw-sidebar-card)),
 .quarto-dashboard .bslib-grid:has(> .card .wmw-chart-card),
-.quarto-dashboard .bslib-grid:has(> .html-fill-item .wmw-chart-card),
-.quarto-dashboard .bslib-grid:has(> .card .wmw-outpost-card:not(.wmw-sidebar-card)),
-.quarto-dashboard .bslib-grid:has(> .html-fill-item .wmw-outpost-card:not(.wmw-sidebar-card)) {
+.quarto-dashboard .bslib-grid:has(> .card .wmw-outpost-card:not(.wmw-sidebar-card)) {
   align-items: stretch !important;
 }
 
-.quarto-dashboard .bslib-grid > .card:has(.wmw-chart-card),
-.quarto-dashboard .bslib-grid > .html-fill-item:has(.wmw-chart-card),
-.quarto-dashboard .bslib-grid > .card:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)),
-.quarto-dashboard .bslib-grid > .html-fill-item:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)) {
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-chart-card),
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-outpost-card:not(.wmw-sidebar-card)) {
   align-self: stretch !important;
-  height: auto !important;
+  height: 100% !important;
   min-height: 100% !important;
+  max-height: none !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+  align-content: stretch !important;
+  align-items: stretch !important;
 }
 
-/* Cards: content height, no inner vertical scroll */
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-chart-card) > .card,
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-chart-card) > .bslib-card,
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card,
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .bslib-card,
+.quarto-dashboard .bslib-grid > .card:has(.wmw-chart-card),
+.quarto-dashboard .bslib-grid > .card:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)) {
+  align-self: stretch !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: none !important;
+}
+
+/* Cards: no inner vertical scroll; peer outpost/chart cards fill their cell */
 .quarto-dashboard .bslib-card,
-.quarto-dashboard .card,
-.quarto-dashboard .bslib-card:has(.wmw-chart-card),
-.quarto-dashboard .card:has(.wmw-chart-card),
-.quarto-dashboard .bslib-card:has(.wmw-outpost-card),
-.quarto-dashboard .card:has(.wmw-outpost-card) {
+.quarto-dashboard .card {
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
@@ -100,24 +111,30 @@ body {
 
 .quarto-dashboard .bslib-card:has(.wmw-chart-card),
 .quarto-dashboard .card:has(.wmw-chart-card),
-.quarto-dashboard .bslib-card:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)),
-.quarto-dashboard .card:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)) {
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card:not(.wmw-sidebar-card)),
+.quarto-dashboard .card:has(.wmw-outpost-card:not(.wmw-sidebar-card)) {
   height: 100% !important;
   min-height: 100% !important;
   align-self: stretch !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-.quarto-dashboard .bslib-card > .card-body,
-.quarto-dashboard .card > .card-body,
 .quarto-dashboard .bslib-card:has(.wmw-chart-card) > .card-body,
 .quarto-dashboard .card:has(.wmw-chart-card) > .card-body,
-.quarto-dashboard .bslib-card:has(.wmw-outpost-card) > .card-body,
-.quarto-dashboard .card:has(.wmw-outpost-card) > .card-body {
-  height: auto !important;
-  max-height: none !important;
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card-body,
+.quarto-dashboard .card:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card-body,
+.quarto-dashboard .bslib-card:has(.wmw-chart-card) > .card-body > .cell-output-display,
+.quarto-dashboard .card:has(.wmw-chart-card) > .card-body > .cell-output-display,
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card-body > .cell-output-display,
+.quarto-dashboard .card:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card-body > .cell-output-display {
+  height: 100% !important;
   min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
   overflow: visible !important;
-  flex: 0 0 auto !important;
 }
 
 .wmw-outpost-card,
@@ -134,7 +151,7 @@ body {
 .wmw-outpost-card > .wmw-op-body,
 .wmw-outpost-card > .wmw-op-body.html-fill-item,
 .wmw-outpost-card > .wmw-op-body.html-fill-container {
-  flex: 0 0 auto !important;
+  flex: 1 1 auto !important;
 }
 
 .wmw-sidebar-card {

@@ -209,12 +209,33 @@
   white-space: normal !important;
 }
 
-@media (max-width: 1400px) {
-  .wmw-human-headline,
-  .wmw-human-headline.html-fill-item,
-  .wmw-human-headline.html-fill-container {
-    font-size: 0.98rem !important;
-  }
+/* Equal-height fill chain for thermometer ↔ Big Lake (nested Quarto grids) */
+.quarto-dashboard .bslib-grid:has(> .bslib-grid .wmw-outpost-card:not(.wmw-sidebar-card)) {
+  align-items: stretch !important;
+}
+
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-outpost-card:not(.wmw-sidebar-card)) {
+  align-self: stretch !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+}
+
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card,
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .bslib-card {
+  height: 100% !important;
+  min-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.quarto-dashboard .card:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card-body,
+.quarto-dashboard .card:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card-body > .cell-output-display {
+  height: 100% !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .wmw-update-note,
