@@ -104,6 +104,10 @@ wmw_interactive_chart <- function(
     unit_badge <- "in"
     digits <- 1                    # exactly one tenth
     title <- "Current Monthly Precip vs Recent Norms"
+    chart_subtitle <- paste0(
+      "Dashed = historical monthly normal · Bold = observed monthly total",
+      "<span class='wmw-chart-subtitle-line'>Badge = last 30 days vs estimated 30-day normal</span>"
+    )
     pos_color <- "#10b981"        # crisp emerald (wetter than normal)
     neg_color <- "#f59e0b"        # warm golden-amber (drier than normal)
 
@@ -157,6 +161,10 @@ wmw_interactive_chart <- function(
     unit_badge <- "in"
     digits <- 0
     title <- "Current Monthly Snowfall vs Recent Norms"
+    chart_subtitle <- paste0(
+      "Dashed = historical monthly normal · Bold = observed monthly total",
+      "<span class='wmw-chart-subtitle-line'>Badge = last 30 days vs estimated 30-day normal</span>"
+    )
     pos_color <- "#a78bfa"        # soft violet lavender (above normal)
     neg_color <- "#818cf8"        # soft periwinkle slate (below normal)
 

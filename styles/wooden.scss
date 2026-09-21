@@ -100,10 +100,10 @@ body {
 .quarto-dashboard .card:has(.wmw-outpost-card),
 .quarto-dashboard .bslib-card:has(.wmw-outpost-card) > .card-body,
 .quarto-dashboard .card:has(.wmw-outpost-card) > .card-body {
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
   max-height: none !important;
-  flex: 0 0 auto !important;
+  flex: 1 1 auto !important;
   overflow: visible !important;
 }
 
@@ -124,7 +124,7 @@ body {
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
   box-sizing: border-box !important;
   font-family: "Nirmala UI", "Nirmala", sans-serif !important;
@@ -147,7 +147,7 @@ body {
 
 .wmw-outpost-card > .wmw-op-body.html-fill-item,
 .wmw-outpost-card > .wmw-op-body.html-fill-container {
-  flex: 0 0 auto !important;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
   overflow: visible !important;
 }
@@ -189,7 +189,7 @@ body {
 .wmw-op-body,
 .wmw-op-body.html-fill-item,
 .wmw-op-body.html-fill-container {
-  flex: 0 0 auto !important;
+  flex: 1 1 auto !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
@@ -375,9 +375,9 @@ p.wmw-human-sub strong,
   min-height: auto !important;
 }
 
-/* Thermometer meta: sit under the bar (no dead air from stretch-to-row) */
+/* Thermometer meta: sit under the bar on short cards; pin to bottom when row-stretched */
 .wmw-outpost-card:not(.wmw-sidebar-card) > .wmw-op-footer {
-  margin-top: 6px !important;
+  margin-top: auto !important;
   flex-wrap: nowrap !important;
   gap: 4px !important;
   overflow-x: auto !important;
@@ -523,6 +523,21 @@ p.wmw-human-sub strong,
   letter-spacing: 0.02em !important;
   color: #64748b !important;
   line-height: 1.3 !important;
+  height: auto !important;
+  white-space: normal !important;
+}
+
+.wmw-dispatch-blurb,
+.wmw-dispatch-blurb.html-fill-item,
+.wmw-dispatch-blurb.html-fill-container {
+  display: block !important;
+  flex: 0 0 auto !important;
+  margin: 6px 0 0 0 !important;
+  padding: 0 2px !important;
+  font-size: 0.68rem !important;
+  font-weight: 500 !important;
+  color: #94a3b8 !important;
+  line-height: 1.4 !important;
   height: auto !important;
   white-space: normal !important;
 }

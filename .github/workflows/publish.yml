@@ -3,10 +3,13 @@ name: Update & Publish Dashboard
 on:
   workflow_dispatch:
   schedule:
-    # ~5:05 AM and ~5:05 PM America/Detroit during EDT (UTC−4).
-    # During EST (UTC−5) these land ~4:05 AM/PM — closest single UTC pair.
-    # GitHub cron can lag by minutes–hours; stamp shows actual render time.
-    - cron: "5 9,21 * * *"
+    # GitHub Actions cron is UTC and often runs 1–5 hours late.
+    # Aim for ~5am / ~5pm America/Detroit during EDT by scheduling early:
+    #   05:05 UTC ≈ 1:05am EDT  (+typical lag → morning)
+    #   19:05 UTC ≈ 3:05pm EDT  (+typical lag → evening)
+    # During EST those targets drift ~1 hour earlier; stamp shows actual time.
+    - cron: "5 5 * * *"
+    - cron: "5 19 * * *"
   push:
     branches: [main]
     paths-ignore:

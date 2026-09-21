@@ -68,6 +68,23 @@ body {
   overflow: visible !important;
 }
 
+/* Peer cards in a row: equal height (thermometer ↔ lake, temp ↔ precip ↔ snow) */
+.quarto-dashboard .bslib-grid:has(> .card .wmw-chart-card),
+.quarto-dashboard .bslib-grid:has(> .html-fill-item .wmw-chart-card),
+.quarto-dashboard .bslib-grid:has(> .card .wmw-outpost-card:not(.wmw-sidebar-card)),
+.quarto-dashboard .bslib-grid:has(> .html-fill-item .wmw-outpost-card:not(.wmw-sidebar-card)) {
+  align-items: stretch !important;
+}
+
+.quarto-dashboard .bslib-grid > .card:has(.wmw-chart-card),
+.quarto-dashboard .bslib-grid > .html-fill-item:has(.wmw-chart-card),
+.quarto-dashboard .bslib-grid > .card:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)),
+.quarto-dashboard .bslib-grid > .html-fill-item:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)) {
+  align-self: stretch !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
 /* Cards: content height, no inner vertical scroll */
 .quarto-dashboard .bslib-card,
 .quarto-dashboard .card,
@@ -79,7 +96,15 @@ body {
   max-height: none !important;
   min-height: 0 !important;
   overflow: visible !important;
-  align-self: start !important;
+}
+
+.quarto-dashboard .bslib-card:has(.wmw-chart-card),
+.quarto-dashboard .card:has(.wmw-chart-card),
+.quarto-dashboard .bslib-card:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)),
+.quarto-dashboard .card:has(.wmw-outpost-card):not(:has(.wmw-sidebar-card)) {
+  height: 100% !important;
+  min-height: 100% !important;
+  align-self: stretch !important;
 }
 
 .quarto-dashboard .bslib-card > .card-body,
@@ -98,10 +123,10 @@ body {
 .wmw-outpost-card,
 .wmw-outpost-card.html-fill-item,
 .wmw-outpost-card.html-fill-container {
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
   max-height: none !important;
-  flex: 0 0 auto !important;
+  flex: 1 1 auto !important;
   overflow-x: hidden !important;
   overflow-y: visible !important;
 }
@@ -120,17 +145,19 @@ body {
 .wmw-chart-card,
 .wmw-chart-card.html-fill-item,
 .wmw-chart-card.html-fill-container {
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-/* Moderated chart budget (~halfway between first fit pass and fill) */
+/* Shared plot budget so temp / precip / snow cards match */
 .wmw-chart-main {
   height: auto !important;
   min-height: 280px !important;
-  flex: 0 0 auto !important;
+  flex: 1 1 auto !important;
   overflow: hidden !important;
 }
 

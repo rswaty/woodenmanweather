@@ -322,7 +322,13 @@ wmw_card_sidebar_dispatch <- function() {
   <div class='wmw-op-footer wmw-sidebar-footer'>
     <div class='wmw-stat-pill'>Last Updated: <strong>", update_str, "</strong></div>
     <div class='wmw-stat-pill'>Station: <strong>Marquette 46.54°N</strong></div>
-    <div class='wmw-update-note'>Forecast auto-updates at 5am / 5pm</div>
+    <div class='wmw-update-note'>Forecast auto-updates ~5am / 5pm Eastern</div>
+    <div class='wmw-dispatch-blurb'>
+      Superior does not do subtle. A sunny morning can turn into horizontal lake-effect by lunch, and the only honest forecast is \"bring a hat you are not emotionally attached to.\"
+    </div>
+    <div class='wmw-dispatch-blurb'>
+      In the U.P. we measure seasons in layers: one for the hike, one for the parking lot wind, and one for the moment you realize Sawyer was lying about \"just a dusting.\"
+    </div>
   </div>
 </div>")
 

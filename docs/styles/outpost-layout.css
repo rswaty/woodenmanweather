@@ -5,7 +5,7 @@
 .wmw-outpost-card.html-fill-item,
 .wmw-outpost-card.html-fill-container {
   justify-content: flex-start !important;
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
   overflow-x: hidden !important;
   overflow-y: visible !important;
@@ -22,7 +22,7 @@
 
 .wmw-outpost-card > .wmw-op-body.html-fill-item,
 .wmw-outpost-card > .wmw-op-body.html-fill-container {
-  flex: 0 0 auto !important;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
   overflow: visible !important;
   justify-content: flex-start !important;
@@ -150,7 +150,7 @@
 }
 
 .wmw-outpost-card:not(.wmw-sidebar-card) > .wmw-op-footer {
-  margin-top: 6px !important;
+  margin-top: auto !important;
   flex-wrap: nowrap !important;
   gap: 4px !important;
   overflow-x: auto !important;
@@ -215,4 +215,30 @@
   .wmw-human-headline.html-fill-container {
     font-size: 0.98rem !important;
   }
+}
+
+.wmw-update-note,
+.wmw-update-note.html-fill-item,
+.wmw-update-note.html-fill-container {
+  display: block !important;
+  flex: 0 0 auto !important;
+  margin: 2px 0 0 0 !important;
+  padding: 0 2px !important;
+  font-size: 0.62rem !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  line-height: 1.3 !important;
+}
+
+.wmw-dispatch-blurb,
+.wmw-dispatch-blurb.html-fill-item,
+.wmw-dispatch-blurb.html-fill-container {
+  display: block !important;
+  flex: 0 0 auto !important;
+  margin: 6px 0 0 0 !important;
+  padding: 0 2px !important;
+  font-size: 0.68rem !important;
+  font-weight: 500 !important;
+  color: #94a3b8 !important;
+  line-height: 1.4 !important;
 }
