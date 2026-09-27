@@ -88,6 +88,16 @@ body {
   align-items: stretch !important;
 }
 
+/* The right column holds both rows; the peer rule above would force them
+   to equal heights. Top row gets a set minimum, chart row sizes to content. */
+.quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-chart-card):has(.wmw-outpost-card) {
+  height: auto !important;
+  min-height: 0 !important;
+  grid-template-rows: minmax(var(--wmw-top-row-h, 340px), max-content) max-content !important;
+  grid-auto-rows: max-content !important;
+  align-content: start !important;
+}
+
 .quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-chart-card) > .card,
 .quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-chart-card) > .bslib-card,
 .quarto-dashboard .bslib-grid > .bslib-grid:has(.wmw-outpost-card:not(.wmw-sidebar-card)) > .card,
@@ -225,6 +235,10 @@ body {
 
 /* Short portable / laptop heights: modest shrink, still page-scroll only */
 @media (max-height: 820px) {
+  .quarto-dashboard {
+    --wmw-top-row-h: 290px;
+  }
+
   .wmw-chart-main,
   .wmw-y-axis-pane,
   .wmw-viewport-shell,
