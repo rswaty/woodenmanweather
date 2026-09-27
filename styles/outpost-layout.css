@@ -166,6 +166,19 @@
   font-size: 0.66rem !important;
 }
 
+.wmw-sidebar-card .wmw-stat-pill,
+.wmw-sidebar-card .wmw-stat-pill.html-fill-item,
+.wmw-sidebar-card .wmw-stat-pill.html-fill-container {
+  white-space: nowrap !important;
+  padding: 4px 8px !important;
+  font-size: 0.78rem !important;
+}
+
+.wmw-sidebar-card .wmw-stat-pill strong {
+  white-space: normal !important;
+  text-align: right !important;
+}
+
 .wmw-gauge-list,
 .wmw-gauge-list.html-fill-item,
 .wmw-gauge-list.html-fill-container {
