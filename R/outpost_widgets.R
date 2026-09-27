@@ -321,7 +321,6 @@ wmw_card_sidebar_dispatch <- function(blurbs = character()) {
   <div class='wmw-op-body' style='justify-content: flex-start; gap: 12px;'>
     <div class='wmw-logo-box'>
       <img class='wmw-logo-img' src='images/logo.jpg' alt='Wooden Man Weather logo'>
-      <div class='wmw-logo-title'>Wooden Man Weather</div>
       <div class='wmw-logo-sub'>Marquette · Lake Superior Outpost</div>
     </div>
   </div>
