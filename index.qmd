@@ -30,6 +30,7 @@ nws_context <- wmw_nws_context()
 forecast <- wmw_nws_forecast_periods(nws_context)
 rolling <- wmw_rolling_year_series()
 recent_30d <- wmw_last_30d_vs_normal()
+recent_365d <- wmw_last_365d_vs_normal()
 
 today_period <- forecast[forecast$is_daytime, ]
 night_period <- forecast[!forecast$is_daytime, ]
@@ -61,10 +62,10 @@ wmw_card_sidebar_dispatch(blurbs = dispatch_blurbs)
 wmw_card_human_thermometer(today_high)
 ```
 
-#### Big Lake & Woodstove
+#### Big Lake and Flannels
 
 ```{r}
-wmw_card_lake_woodstove(today_high, forecast, context = nws_context)
+wmw_card_lake_flannels(today_high, forecast, context = nws_context)
 ```
 
 ### Row
@@ -82,7 +83,10 @@ wmw_interactive_chart(
   rolling,
   "precipitation",
   recent_obs = recent_30d$prcp_in,
-  recent_norm = recent_30d$prcp_normal
+  recent_norm = recent_30d$prcp_normal,
+  year_obs = recent_365d$prcp_in,
+  year_norm = recent_365d$prcp_normal,
+  data_through = recent_30d$end_date
 )
 ```
 
@@ -93,6 +97,9 @@ wmw_interactive_chart(
   rolling,
   "snowfall",
   recent_obs = recent_30d$snow_in,
-  recent_norm = recent_30d$snow_normal
+  recent_norm = recent_30d$snow_normal,
+  year_obs = recent_365d$snow_in,
+  year_norm = recent_365d$snow_normal,
+  data_through = recent_30d$end_date
 )
 ```

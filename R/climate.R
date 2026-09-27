@@ -61,6 +61,65 @@ wmw_ncei_monthly_normals <- function(station = wmw_station_id()) {
   )
 }
 
+#' Load the daily NCEI cache, topping it up from NCEI when it is more than
+#' two days behind. NCEI typically lags ~5 days, and recent days get revised,
+#' so the last two weeks are always re-fetched. A failed fetch keeps the cache.
+wmw_load_daily <- function(
+  end_date = Sys.Date(),
+  station = wmw_station_id(),
+  keep_days = 420
+) {
+  end_date <- as.Date(end_date)
+  daily_cache <- file.path("data", "climate_daily.csv")
+
+  daily <- if (file.exists(daily_cache) && file.size(daily_cache) > 0) {
+    readr::read_csv(daily_cache, show_col_types = FALSE)
+  } else {
+    NULL
+  }
+  if (!is.null(daily)) daily$date <- as.Date(daily$date)
+
+  last_date <- if (is.null(daily) || nrow(daily) == 0) NA else max(daily$date, na.rm = TRUE)
+
+  if (is.na(last_date) || last_date < end_date - 2) {
+    from <- if (is.na(last_date)) end_date - keep_days else last_date - 14
+    fresh <- tryCatch(
+      wmw_ncei_daily(from, end_date, station = station),
+      error = function(e) {
+        message("NCEI daily refresh failed: ", conditionMessage(e))
+        NULL
+      }
+    )
+    if (!is.null(fresh) && nrow(fresh) > 0) {
+      keep <- if (is.null(daily)) NULL else daily[!daily$date %in% fresh$date, c("date", "tmax_f", "tmin_f", "prcp_in", "snow_in")]
+      daily <- rbind(as.data.frame(keep), fresh)
+      daily <- daily[order(daily$date), , drop = FALSE]
+      daily <- daily[daily$date >= end_date - keep_days, , drop = FALSE]
+      dir.create("data", showWarnings = FALSE)
+      readr::write_csv(daily, daily_cache)
+    }
+  }
+
+  if (is.null(daily)) {
+    daily <- data.frame(
+      date = as.Date(character()), tmax_f = numeric(), tmin_f = numeric(),
+      prcp_in = numeric(), snow_in = numeric()
+    )
+  }
+  daily
+}
+
+wmw_load_normals <- function(station = wmw_station_id()) {
+  normals_cache <- file.path("data", "climate_normals.csv")
+  if (file.exists(normals_cache)) {
+    normals <- readr::read_csv(normals_cache, show_col_types = FALSE)
+    if (all(c("tmax_f", "prcp_in", "snow_in") %in% names(normals))) return(normals)
+  }
+  normals <- wmw_ncei_monthly_normals(station)
+  readr::write_csv(normals, normals_cache)
+  normals
+}
+
 wmw_monthly_summary <- function(daily) {
   daily$month <- as.integer(format(daily$date, "%m"))
   daily$year <- as.integer(format(daily$date, "%Y"))
@@ -127,28 +186,8 @@ wmw_rolling_year_series <- function(
   station = wmw_station_id(),
   normals = NULL
 ) {
-  start_date <- end_date - 365
-  daily_cache <- file.path("data", "climate_daily.csv")
-  normals_cache <- file.path("data", "climate_normals.csv")
-
-  if (is.null(normals)) {
-    if (file.exists(normals_cache)) {
-      normals <- readr::read_csv(normals_cache, show_col_types = FALSE)
-      if (!"tmax_f" %in% names(normals)) {
-        normals <- wmw_ncei_monthly_normals(station)
-        readr::write_csv(normals, normals_cache)
-      }
-    } else {
-      normals <- wmw_ncei_monthly_normals(station)
-      readr::write_csv(normals, normals_cache)
-    }
-  }
-
-  daily <- if (file.exists(daily_cache) && file.size(daily_cache) > 0) {
-    readr::read_csv(daily_cache, show_col_types = FALSE)
-  } else {
-    wmw_ncei_daily(start_date, end_date, station = station)
-  }
+  if (is.null(normals)) normals <- wmw_load_normals(station)
+  daily <- wmw_load_daily(end_date, station = station)
 
   monthly <- wmw_monthly_summary(daily)
 
@@ -183,53 +222,37 @@ wmw_rolling_year_series <- function(
   monthly
 }
 
-#' Rolling last-30-day precip/snow observed totals vs estimated 30-day normals.
+#' Observed precip/snow over the last `n_days` of available data vs a prorated normal.
 #'
-#' Normals are built from NOAA 1991–2020 monthly normals by allocating each
-#' day's share as (month_normal / days_in_month) over the last 30 calendar days.
-wmw_last_30d_vs_normal <- function(
+#' The window ends on the last day NCEI has reported (not today), and normals
+#' only count days that have an observation: each day's share is
+#' month_normal / days_in_month from the NOAA 1991–2020 monthly normals.
+wmw_window_vs_normal <- function(
+  n_days = 30,
   end_date = Sys.Date(),
   station = wmw_station_id(),
-  normals = NULL
+  normals = NULL,
+  daily = NULL
 ) {
   end_date <- as.Date(end_date)
-  start_date <- end_date - 29
-  daily_cache <- file.path("data", "climate_daily.csv")
-  normals_cache <- file.path("data", "climate_normals.csv")
+  if (is.null(normals)) normals <- wmw_load_normals(station)
+  if (is.null(daily)) daily <- wmw_load_daily(end_date, station = station)
 
-  if (is.null(normals)) {
-    if (file.exists(normals_cache)) {
-      normals <- readr::read_csv(normals_cache, show_col_types = FALSE)
-      if (!"prcp_in" %in% names(normals)) {
-        normals <- wmw_ncei_monthly_normals(station)
-        readr::write_csv(normals, normals_cache)
-      }
-    } else {
-      normals <- wmw_ncei_monthly_normals(station)
-      readr::write_csv(normals, normals_cache)
-    }
-  }
-
-  daily <- if (file.exists(daily_cache) && file.size(daily_cache) > 0) {
-    readr::read_csv(daily_cache, show_col_types = FALSE)
-  } else {
-    wmw_ncei_daily(start_date, end_date, station = station)
-  }
-
-  if (!"date" %in% names(daily) || nrow(daily) == 0) {
-    return(list(
-      prcp_in = 0, prcp_normal = 0,
-      snow_in = 0, snow_normal = 0,
-      n_days = 0L
-    ))
-  }
+  empty <- list(
+    prcp_in = NA_real_, prcp_normal = NA_real_,
+    snow_in = NA_real_, snow_normal = NA_real_,
+    n_days = 0L, start_date = as.Date(NA), end_date = as.Date(NA)
+  )
+  if (!"date" %in% names(daily) || nrow(daily) == 0) return(empty)
 
   daily$date <- as.Date(daily$date)
-  recent <- daily[daily$date >= start_date & daily$date <= end_date, , drop = FALSE]
+  data_end <- min(end_date, max(daily$date, na.rm = TRUE))
+  start_date <- data_end - (n_days - 1)
+  recent <- daily[daily$date >= start_date & daily$date <= data_end, , drop = FALSE]
+  if (nrow(recent) == 0) return(empty)
 
-  day_seq <- seq(start_date, end_date, by = "day")
-  y <- as.integer(format(day_seq, "%Y"))
-  m <- as.integer(format(day_seq, "%m"))
+  y <- as.integer(format(recent$date, "%Y"))
+  m <- as.integer(format(recent$date, "%m"))
   next_month <- ifelse(m == 12L, 1L, m + 1L)
   next_year <- ifelse(m == 12L, y + 1L, y)
   month_start <- as.Date(sprintf("%04d-%02d-01", y, m))
@@ -239,17 +262,29 @@ wmw_last_30d_vs_normal <- function(
   prcp_by_month <- setNames(wmw_as_numeric(normals$prcp_in), as.character(as.integer(normals$month)))
   snow_by_month <- setNames(wmw_as_numeric(normals$snow_in), as.character(as.integer(normals$month)))
   month_keys <- as.character(m)
+  prcp_share <- prcp_by_month[month_keys] / days_in_month
+  snow_share <- snow_by_month[month_keys] / days_in_month
 
-  prcp_normal <- sum(prcp_by_month[month_keys] / days_in_month, na.rm = TRUE)
-  snow_normal <- sum(snow_by_month[month_keys] / days_in_month, na.rm = TRUE)
+  prcp <- wmw_as_numeric(recent$prcp_in)
+  snow <- wmw_as_numeric(recent$snow_in)
 
   list(
-    prcp_in = sum(wmw_as_numeric(recent$prcp_in), na.rm = TRUE),
-    prcp_normal = as.numeric(prcp_normal),
-    snow_in = sum(wmw_as_numeric(recent$snow_in), na.rm = TRUE),
-    snow_normal = as.numeric(snow_normal),
-    n_days = length(day_seq)
+    prcp_in = sum(prcp, na.rm = TRUE),
+    prcp_normal = sum(prcp_share[!is.na(prcp)], na.rm = TRUE),
+    snow_in = sum(snow, na.rm = TRUE),
+    snow_normal = sum(snow_share[!is.na(snow)], na.rm = TRUE),
+    n_days = sum(!is.na(prcp)),
+    start_date = start_date,
+    end_date = data_end
   )
+}
+
+wmw_last_30d_vs_normal <- function(end_date = Sys.Date(), station = wmw_station_id(), normals = NULL) {
+  wmw_window_vs_normal(30, end_date = end_date, station = station, normals = normals)
+}
+
+wmw_last_365d_vs_normal <- function(end_date = Sys.Date(), station = wmw_station_id(), normals = NULL) {
+  wmw_window_vs_normal(365, end_date = end_date, station = station, normals = normals)
 }
 
 #' Rolling last-30-day precip and snowfall totals from daily cache / NCEI

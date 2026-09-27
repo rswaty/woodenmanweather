@@ -94,43 +94,39 @@ wmw_nws_next_days <- function(context = wmw_nws_context(), days = 7) {
   out[order(out$start_time), , drop = FALSE]
 }
 
-wmw_nws_alerts <- function() {
+#' Active NWS alerts for Marquette plus the nearshore marine zones on either
+#' side of the harbor (LSZ248 Huron Islands–Marquette, LSZ249 Marquette–Munising).
+wmw_nws_alerts <- function(zones = c("LSZ248", "LSZ249")) {
   coords <- wmw_marquette_coords()
-  url <- paste0(
-    "https://api.weather.gov/alerts/active?point=",
-    coords$latitude,
-    ",",
-    coords$longitude
+  urls <- c(
+    paste0("https://api.weather.gov/alerts/active?point=", coords$latitude, ",", coords$longitude),
+    if (length(zones) > 0) paste0("https://api.weather.gov/alerts/active?zone=", paste(zones, collapse = ","))
   )
 
-  payload <- tryCatch(
-    wmw_get_json(url),
-    error = function(e) NULL
+  empty <- data.frame(
+    event = character(), headline = character(), severity = character(),
+    ends = character(), stringsAsFactors = FALSE
   )
 
-  features <- payload$features
-  empty_features <- is.null(features) ||
-    (is.data.frame(features) && nrow(features) == 0) ||
-    length(features) == 0
-
-  if (is.null(payload) || empty_features) {
-    return(data.frame(
-      event = character(),
-      headline = character(),
-      severity = character(),
-      ends = character(),
+  pieces <- lapply(urls, function(url) {
+    payload <- tryCatch(wmw_get_json(url), error = function(e) NULL)
+    props <- payload$features$properties
+    if (is.null(props) || !is.data.frame(props) || nrow(props) == 0) return(empty)
+    ends <- props$ends %||% rep(NA_character_, nrow(props))
+    expires <- props$expires %||% rep(NA_character_, nrow(props))
+    ends[is.na(ends)] <- expires[is.na(ends)]
+    data.frame(
+      event = props$event %||% "",
+      headline = props$headline %||% "",
+      severity = props$severity %||% "",
+      ends = ends,
       stringsAsFactors = FALSE
-    ))
-  }
+    )
+  })
 
-  props <- payload$features$properties
-  data.frame(
-    event = props$event %||% "",
-    headline = props$headline %||% "",
-    severity = props$severity %||% "",
-    ends = props$ends %||% "",
-    stringsAsFactors = FALSE
-  )
+  alerts <- do.call(rbind, pieces)
+  if (nrow(alerts) == 0) return(empty)
+  alerts[!duplicated(alerts$event), , drop = FALSE]
 }
 
 `%||%` <- function(x, y) {

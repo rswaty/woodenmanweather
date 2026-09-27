@@ -19,7 +19,10 @@ wmw_interactive_chart <- function(
   today_low = NULL,
   month_total = NULL,
   recent_obs = NULL,
-  recent_norm = NULL
+  recent_norm = NULL,
+  year_obs = NULL,
+  year_norm = NULL,
+  data_through = NULL
 ) {
   metric <- match.arg(metric)
   if (is.null(chart_id)) {
@@ -35,6 +38,15 @@ wmw_interactive_chart <- function(
 
   secondary_badge_html <- ""
   chart_subtitle <- ""
+  through_str <- if (!is.null(data_through) && !is.na(data_through)) {
+    paste0(" through ", format(as.Date(data_through), "%b "), as.integer(format(as.Date(data_through), "%d")))
+  } else {
+    ""
+  }
+  badge_note <- paste0(
+    "<span class='wmw-chart-subtitle-line'>Badges = last 30 days &amp; 12 months",
+    through_str, " vs normal</span>"
+  )
   max_vals <- NULL
   low_obs_vals <- NULL
   low_norm_vals <- NULL
@@ -106,7 +118,7 @@ wmw_interactive_chart <- function(
     title <- "Current Monthly Precip vs Recent Norms"
     chart_subtitle <- paste0(
       "Dashed = historical monthly normal · Bold = observed monthly total",
-      "<span class='wmw-chart-subtitle-line'>Badge = last 30 days vs estimated 30-day normal</span>"
+      badge_note
     )
     pos_color <- "#10b981"        # crisp emerald (wetter than normal)
     neg_color <- "#f59e0b"        # warm golden-amber (drier than normal)
@@ -139,8 +151,8 @@ wmw_interactive_chart <- function(
     curr_color <- if (is.na(latest_diff) || latest_diff >= 0) pos_color else neg_color
 
     # Keep 12-month context as the secondary badge
-    cum_obs <- sum(obs_vals, na.rm = TRUE)
-    cum_norm <- sum(norm_vals, na.rm = TRUE)
+    cum_obs <- if (!is.null(year_obs) && !is.na(year_obs)) as.numeric(year_obs) else sum(obs_vals, na.rm = TRUE)
+    cum_norm <- if (!is.null(year_norm) && !is.na(year_norm)) as.numeric(year_norm) else sum(norm_vals, na.rm = TRUE)
     cum_diff <- cum_obs - cum_norm
     cum_rounded <- round(cum_diff, digits)
     if (abs(cum_rounded) == 0) cum_rounded <- 0
@@ -149,7 +161,7 @@ wmw_interactive_chart <- function(
     cum_obs_str <- paste0(format(round(cum_obs, digits), nsmall = digits), " in")
     secondary_badge_html <- paste0(
       "<div class='wmw-stat-badge'>",
-      "<span class='wmw-stat-now-label'>12-Mo Total:</span>",
+      "<span class='wmw-stat-now-label'>Last 12 Mo:</span>",
       "<span class='wmw-stat-now-value'>", cum_obs_str, "</span>",
       "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(", cum_diff_str, " vs. normal)</span>",
       "</div>"
@@ -163,7 +175,7 @@ wmw_interactive_chart <- function(
     title <- "Current Monthly Snowfall vs Recent Norms"
     chart_subtitle <- paste0(
       "Dashed = historical monthly normal · Bold = observed monthly total",
-      "<span class='wmw-chart-subtitle-line'>Badge = last 30 days vs estimated 30-day normal</span>"
+      badge_note
     )
     pos_color <- "#a78bfa"        # soft violet lavender (above normal)
     neg_color <- "#818cf8"        # soft periwinkle slate (below normal)
@@ -194,8 +206,8 @@ wmw_interactive_chart <- function(
     diff_context <- "vs. 30-day normal"
     curr_color <- if (is.na(latest_diff) || latest_diff >= 0) pos_color else neg_color
 
-    cum_obs <- sum(obs_vals, na.rm = TRUE)
-    cum_norm <- sum(norm_vals, na.rm = TRUE)
+    cum_obs <- if (!is.null(year_obs) && !is.na(year_obs)) as.numeric(year_obs) else sum(obs_vals, na.rm = TRUE)
+    cum_norm <- if (!is.null(year_norm) && !is.na(year_norm)) as.numeric(year_norm) else sum(norm_vals, na.rm = TRUE)
     cum_diff <- cum_obs - cum_norm
     cum_rounded <- round(cum_diff, digits)
     if (abs(cum_rounded) == 0) cum_rounded <- 0
@@ -204,7 +216,7 @@ wmw_interactive_chart <- function(
     cum_obs_str <- paste0(format(round(cum_obs, digits), nsmall = digits), " in")
     secondary_badge_html <- paste0(
       "<div class='wmw-stat-badge'>",
-      "<span class='wmw-stat-now-label'>12-Mo Total:</span>",
+      "<span class='wmw-stat-now-label'>Last 12 Mo:</span>",
       "<span class='wmw-stat-now-value'>", cum_obs_str, "</span>",
       "<span class='wmw-stat-now-diff' style='color: #94a3b8;'>(", cum_diff_str, " vs. normal)</span>",
       "</div>"

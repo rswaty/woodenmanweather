@@ -222,6 +222,13 @@
   white-space: normal !important;
 }
 
+.wmw-gauge-note {
+  display: block !important;
+  font-size: 0.68rem !important;
+  color: #94a3b8 !important;
+  margin-top: 1px !important;
+}
+
 /* Equal-height fill chain for thermometer ↔ Big Lake (nested Quarto grids) */
 .quarto-dashboard .bslib-grid:has(> .bslib-grid .wmw-outpost-card:not(.wmw-sidebar-card)) {
   align-items: stretch !important;
