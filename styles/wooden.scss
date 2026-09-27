@@ -552,9 +552,24 @@ p.wmw-human-sub strong,
   white-space: normal !important;
 }
 
+.wmw-logo-img,
+.wmw-logo-img.html-fill-item {
+  display: block !important;
+  width: 78% !important;
+  max-width: 180px !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 2px solid rgba(56, 189, 248, 0.35) !important;
+  margin: 2px auto 6px auto !important;
+  flex: 0 0 auto !important;
+}
+
 .wmw-logo-box {
   background: #0b111a !important;
-  border: 1px dashed rgba(56, 189, 248, 0.35) !important;
+  border: 1px solid rgba(56, 189, 248, 0.2) !important;
   border-radius: 8px !important;
   padding: 12px 10px !important;
   text-align: center !important;

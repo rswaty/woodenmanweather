@@ -37,21 +37,21 @@ today_high <- if (nrow(today_period) > 0) today_period$temperature[1] else forec
 today_low <- if (nrow(night_period) > 0) night_period$temperature[1] else NA_real_
 ```
 
-## Column {width=20%}
+## Column {width="20%"}
 
 ### Outpost Notes & Logo
 
 ```{r}
 # --- EDIT LEFT-COLUMN DISPATCH TEXT HERE ---
 dispatch_blurbs <- c(
-  'Superior does not do subtle. A sunny morning can turn into horizontal lake-effect by lunch, and the only honest forecast is "bring a hat you are not emotionally attached to."',
-  'In the U.P. we measure seasons in layers: one for the hike, one for the parking lot wind, and one for the moment you realize Sawyer was lying about "just a dusting."'
+  'Superior can rage, or be very suble. A sunny morning can turn into horizontal lake-effect by lunch, and the only honest forecast is "bring a hat you are not emotionally attached to."',
+  'I love the weather, especially the poetry of it, "Some sun this morning, clouds build in the eveningtime", or "snow developing late, fading as the sun rises" just has a great ring to it.  During the Covidocene Era I made some videos containing a daily forecast, and a joke or two.  Here I channel my inner stock trader with a dashboard I hope you find useful.'
 )
 
 wmw_card_sidebar_dispatch(blurbs = dispatch_blurbs)
 ```
 
-## Column {width=80%}
+## Column {width="80%"}
 
 ### Row
 

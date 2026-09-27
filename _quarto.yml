@@ -5,6 +5,8 @@ project:
     - index.qmd
     - monday.qmd
     - about.qmd
+  resources:
+    - images/logo.jpg
 
 website:
   title: "Wooden Man Weather"
