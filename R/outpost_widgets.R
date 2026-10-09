@@ -36,14 +36,53 @@ wmw_calc_human_thermometer <- function(temp_f, date = Sys.Date()) {
   )
 }
 
-#' Latest Lake Superior buoy readings (NOAA NDBC realtime feed).
-#' Water temp and wave height each come from the first listed buoy that has a
-#' reading in the last 12 hours. Buoys are pulled for winter (~Nov to May).
+#' Latest Lake Superior buoy readings.
+#' First choice is the Superior Watershed Partnership Marquette buoy (off Presque
+#' Isle) via the GLOS public ERDDAP, which can lag a day or more, so its reading
+#' time is always shown. Fallbacks are NOAA NDBC buoys with a reading in the last
+#' 12 hours. All buoys are pulled for winter (~Nov to May).
 wmw_lake_buoy_stations <- function() {
   data.frame(
     id = c("45211", "45025", "45023"),
     name = c("Grand Island buoy", "South Entry buoy", "North Entry buoy"),
     stringsAsFactors = FALSE
+  )
+}
+
+#' Marquette Spotter buoy (GLOS obs_139). Skips readings whose QARTOD
+#' aggregate flag is 4 (fail); 1 pass, 2 not evaluated, 3 suspect are kept.
+wmw_marquette_buoy_latest <- function(max_age_hours = 72) {
+  url <- paste0(
+    "https://seagull-erddap.glos.org/erddap/tabledap/obs_139.csv?",
+    "time,sea_surface_temperature,sea_surface_temperature_aggregate_test,",
+    "sea_surface_wave_significant_height,sea_surface_wave_significant_height_aggregate_test",
+    "&time%3E=now-", ceiling(max_age_hours / 24), "days"
+  )
+  txt <- tryCatch({
+    r <- httr::GET(url, httr::add_headers(`User-Agent` = wmw_user_agent()), httr::timeout(30))
+    if (httr::status_code(r) != 200) NULL else httr::content(r, as = "text", encoding = "UTF-8")
+  }, error = function(e) NULL)
+  if (is.null(txt)) return(NULL)
+
+  lines <- strsplit(txt, "\n", fixed = FALSE)[[1]]
+  if (length(lines) < 3) return(NULL)
+  d <- utils::read.csv(text = paste(lines[-2], collapse = "\n"), stringsAsFactors = FALSE)
+  when <- as.POSIXct(d$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+  fresh <- !is.na(when) & when >= Sys.time() - max_age_hours * 3600
+
+  pick <- function(val, flag) {
+    v <- wmw_as_numeric(val)
+    f <- wmw_as_numeric(flag)
+    ok <- which(fresh & !is.na(v) & (is.na(f) | f != 4))
+    if (length(ok) == 0) return(NULL)
+    i <- ok[which.max(when[ok])]
+    list(value = v[i], time = when[i])
+  }
+  wtmp <- pick(d$sea_surface_temperature, d$sea_surface_temperature_aggregate_test)
+  if (!is.null(wtmp)) wtmp$value <- wtmp$value - 273.15
+  list(
+    wtmp_c = wtmp,
+    wvht_m = pick(d$sea_surface_wave_significant_height, d$sea_surface_wave_significant_height_aggregate_test)
   )
 }
 
@@ -83,22 +122,38 @@ wmw_ndbc_latest <- function(station_id, max_age_hours = 12) {
 wmw_lake_buoy <- function() {
   stations <- wmw_lake_buoy_stations()
   out <- list(water_f = NA_real_, water_src = NA_character_, water_time = NULL,
-              wave_ft = NA_real_, wave_src = NA_character_)
-  for (k in seq_len(nrow(stations))) {
-    obs <- wmw_ndbc_latest(stations$id[k])
-    if (is.null(obs)) next
+              wave_ft = NA_real_, wave_src = NA_character_, wave_time = NULL)
+
+  take <- function(out, obs, name) {
+    if (is.null(obs)) return(out)
     if (is.na(out$water_f) && !is.null(obs$wtmp_c)) {
       out$water_f <- obs$wtmp_c$value * 9 / 5 + 32
-      out$water_src <- stations$name[k]
+      out$water_src <- name
       out$water_time <- obs$wtmp_c$time
     }
     if (is.na(out$wave_ft) && !is.null(obs$wvht_m)) {
       out$wave_ft <- obs$wvht_m$value * 3.28084
-      out$wave_src <- stations$name[k]
+      out$wave_src <- name
+      out$wave_time <- obs$wvht_m$time
     }
+    out
+  }
+
+  out <- take(out, wmw_marquette_buoy_latest(), "Marquette buoy")
+  for (k in seq_len(nrow(stations))) {
     if (!is.na(out$water_f) && !is.na(out$wave_ft)) break
+    out <- take(out, wmw_ndbc_latest(stations$id[k]), stations$name[k])
   }
   out
+}
+
+#' "today 6:56 AM" / "yesterday 7:38 PM" / "Fri 7:38 PM" in Marquette time.
+wmw_when <- function(x, tz = "America/Detroit") {
+  local <- lubridate::with_tz(x, tz)
+  d <- as.Date(local, tz = tz)
+  today <- as.Date(lubridate::with_tz(Sys.time(), tz), tz = tz)
+  day <- if (d == today) "today" else if (d == today - 1) "yesterday" else format(local, "%a")
+  paste(day, wmw_clock(x, tz))
 }
 
 wmw_clock <- function(x, tz = "America/Detroit") {
@@ -420,12 +475,14 @@ wmw_card_lake_flannels <- function(today_high, forecast_df, date = Sys.Date(),
     } else {
       ""
     }
-    src <- buoy$water_src
-    if (!is.na(buoy$wave_ft) && !identical(buoy$wave_src, buoy$water_src)) src <- paste0(src, " / ", buoy$wave_src)
+    note <- paste0(buoy$water_src, " · reading from ", wmw_when(buoy$water_time))
+    if (!is.na(buoy$wave_ft) && !identical(buoy$wave_src, buoy$water_src)) {
+      note <- paste0(note, " · waves: ", buoy$wave_src, ", ", wmw_when(buoy$wave_time))
+    }
     water_html <- paste0(
       "<strong style='color: #38bdf8;'>", round(buoy$water_f), "°F</strong> <span class='wmw-gauge-sub'>water</span>",
       wave_html,
-      "<span class='wmw-gauge-note'>", esc(src), " · ", wmw_clock(buoy$water_time), "</span>"
+      "<span class='wmw-gauge-note'>", esc(note), "</span>"
     )
   } else {
     water_html <- "<strong style='color: #94a3b8;'>Buoys out for the season</strong> <span class='wmw-gauge-sub'>— readings resume in spring</span>"
@@ -503,6 +560,7 @@ wmw_card_sidebar_dispatch <- function(blurbs = character()) {
   <div class='wmw-op-body' style='justify-content: flex-start; gap: 12px;'>
     <div class='wmw-logo-box'>
       <img class='wmw-logo-img' src='images/logo.jpg' alt='Wooden Man Weather logo'>
+      <div class='wmw-logo-credit'>Logo design by Leo Barch</div>
       <div class='wmw-logo-sub'>Marquette · Lake Superior Outpost</div>
     </div>
   </div>

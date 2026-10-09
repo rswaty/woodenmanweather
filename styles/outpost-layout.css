@@ -222,6 +222,17 @@
   white-space: normal !important;
 }
 
+.wmw-logo-credit,
+.wmw-logo-credit.html-fill-item {
+  display: block !important;
+  flex: 0 0 auto !important;
+  margin: -2px 0 4px 0 !important;
+  font-size: 0.62rem !important;
+  font-style: italic !important;
+  color: #64748b !important;
+  letter-spacing: 0.02em !important;
+}
+
 .wmw-gauge-note {
   display: block !important;
   font-size: 0.68rem !important;
