@@ -570,6 +570,7 @@ wmw_card_sidebar_dispatch <- function(blurbs = character()) {
     <div class='wmw-stat-pill'>Station: <strong>Marquette 46.54°N</strong></div>
     <div class='wmw-update-note'>Forecast auto-updates ~5am / 5pm Eastern</div>
     ", blurb_html, "
+    <div class='wmw-honor-note'>I built this to honor the National Weather Service and National Oceanic and Atmospheric Administration who developed all of the data used here.</div>
   </div>
 </div>")
 

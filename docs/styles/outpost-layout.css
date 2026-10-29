@@ -222,6 +222,23 @@
   white-space: normal !important;
 }
 
+.wmw-logo-img,
+.wmw-logo-img.html-fill-item {
+  width: 100% !important;
+  max-width: 230px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 auto 4px auto !important;
+}
+
+.wmw-logo-box,
+.wmw-logo-box.html-fill-item,
+.wmw-logo-box.html-fill-container {
+  padding: 10px 8px 8px 8px !important;
+}
+
 .wmw-logo-credit,
 .wmw-logo-credit.html-fill-item {
   display: block !important;
@@ -293,4 +310,19 @@
   font-weight: 500 !important;
   color: #94a3b8 !important;
   line-height: 1.45 !important;
+}
+
+.wmw-honor-note,
+.wmw-honor-note.html-fill-item,
+.wmw-honor-note.html-fill-container {
+  display: block !important;
+  flex: 0 0 auto !important;
+  margin: 14px 0 0 0 !important;
+  padding: 0 2px !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  color: #94a3b8 !important;
+  line-height: 1.45 !important;
+  height: auto !important;
+  white-space: normal !important;
 }

@@ -554,18 +554,34 @@ p.wmw-human-sub strong,
   white-space: normal !important;
 }
 
+.wmw-honor-note,
+.wmw-honor-note.html-fill-item,
+.wmw-honor-note.html-fill-container {
+  display: block !important;
+  flex: 0 0 auto !important;
+  margin: 14px 0 0 0 !important;
+  padding: 0 2px !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  color: #94a3b8 !important;
+  line-height: 1.45 !important;
+  height: auto !important;
+  white-space: normal !important;
+}
+
 .wmw-logo-img,
 .wmw-logo-img.html-fill-item {
   display: block !important;
-  width: 78% !important;
-  max-width: 180px !important;
+  width: 100% !important;
+  max-width: 230px !important;
   height: auto !important;
   aspect-ratio: 1 / 1 !important;
   object-fit: cover !important;
+  object-position: center !important;
   border-radius: 50% !important;
-  background: #ffffff !important;
-  border: 2px solid rgba(56, 189, 248, 0.35) !important;
-  margin: 2px auto 6px auto !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 auto 4px auto !important;
   flex: 0 0 auto !important;
 }
 
@@ -573,7 +589,7 @@ p.wmw-human-sub strong,
   background: #0b111a !important;
   border: 1px solid rgba(56, 189, 248, 0.2) !important;
   border-radius: 8px !important;
-  padding: 12px 10px !important;
+  padding: 10px 8px 8px 8px !important;
   text-align: center !important;
   display: flex !important;
   flex-direction: column !important;
