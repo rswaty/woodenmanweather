@@ -222,6 +222,19 @@
   white-space: normal !important;
 }
 
+.wmw-gauge-val a.wmw-nws-link,
+.wmw-gauge-val a.wmw-nws-link.html-fill-item {
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+  cursor: pointer !important;
+}
+
+.wmw-gauge-val a.wmw-nws-link:hover,
+.wmw-gauge-val a.wmw-nws-link.html-fill-item:hover {
+  color: #ffffff !important;
+}
+
 .wmw-logo-img,
 .wmw-logo-img.html-fill-item {
   width: 100% !important;

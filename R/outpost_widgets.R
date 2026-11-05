@@ -1,9 +1,10 @@
 # Wooden Man Weather — Outpost Top Row Widgets (Option 1: Field Slate & Forest Pine)
 # Provides:
 # 1. Global Human Thermometer (Instrument Readout + Percentile Bar + Stats)
-# 2. Big Lake and Flannels Gauge (Lake, Breeze, Flannel Index, Daylight)
+# 2. Big Lake and Flannels Gauge (Lake, Warnings, Flannel Index, Daylight)
 
 source("R/constants.R")
+source("R/nws.R")
 
 #' Global Human Thermometer Model
 #' Estimates where Marquette's current temperature ranks against the world's 8.16B human population.
@@ -292,20 +293,55 @@ wmw_calc_flannel_index <- function(today_high) {
   }
 }
 
-#' Lake Breeze & Surf State
-wmw_calc_lake_breeze <- function(wind_dir, wind_speed) {
-  if (is.null(wind_dir) || is.na(wind_dir) || nchar(wind_dir) == 0) {
-    return(list(state = "Calm / Variable", color = "#34d399", desc = "Glassy shore"))
+#' Value HTML for the Warnings gauge. Each warning, advisory, and alert links
+#' to that product on forecast.weather.gov.
+wmw_warnings_gauge_html <- function(date = Sys.Date()) {
+  alerts <- tryCatch(wmw_warnings_today(date = date), error = function(e) {
+    empty <- data.frame(
+      event = character(), headline = character(), severity = character(),
+      onset = character(), ends = character(), url = character(),
+      stringsAsFactors = FALSE
+    )
+    attr(empty, "fetched") <- FALSE
+    empty
+  })
+  esc <- htmltools::htmlEscape
+
+  if (!isTRUE(attr(alerts, "fetched"))) {
+    return(paste0(
+      "<strong style='color: #fbbf24;'>Couldn't reach the NWS</strong>",
+      " <span class='wmw-gauge-sub'>— check ",
+      "<a class='wmw-nws-link' href='https://www.weather.gov/' target='_blank' rel='noopener noreferrer' style='color: #fbbf24;'>weather.gov</a>",
+      "</span>"
+    ))
+  }
+  if (nrow(alerts) == 0) {
+    return("<strong style='color: #34d399;'>None today-take it easy</strong>")
   }
 
-  dir_upper <- toupper(wind_dir)
-  if (grepl("E|NE|SE", dir_upper)) {
-    list(state = "Onshore Lake Breeze", color = "#38bdf8", desc = "Choppy surf · Cooler in city")
-  } else if (grepl("S|SW|W", dir_upper)) {
-    list(state = "Offshore Breeze", color = "#34d399", desc = "Calm near shore · Beach warmth")
-  } else {
-    list(state = "Northerly Wind", color = "#cbd5e1", desc = "Lake rollers · Canadian air")
-  }
+  lines <- vapply(seq_len(nrow(alerts)), function(i) {
+    event <- alerts$event[i]
+    color <- if (grepl("Warning$", event)) {
+      "#f87171"
+    } else if (grepl("Advisory$", event)) {
+      "#fbbf24"
+    } else {
+      "#fb923c"
+    }
+    href <- alerts$url[i]
+    if (length(href) == 0 || is.na(href) || !nzchar(href)) href <- "https://www.weather.gov/"
+    until <- ""
+    ends <- wmw_parse_nws_time(alerts$ends[i])
+    if (length(ends) == 1 && !is.na(ends)) {
+      until <- paste0(" <span class='wmw-gauge-sub'>— until ", esc(wmw_when(ends)), "</span>")
+    }
+    paste0(
+      "<strong><a class='wmw-nws-link' href='", esc(href),
+      "' target='_blank' rel='noopener noreferrer' style='color: ", color, ";'>",
+      esc(event), "</a></strong>", until
+    )
+  }, character(1))
+  paste(lines, collapse = "<br>")
 }
 
 #' Rain Gauge / 24-Hour Soak (Idea A)
@@ -453,11 +489,6 @@ wmw_card_lake_flannels <- function(today_high, forecast_df, date = Sys.Date(),
   daylight <- wmw_calc_daylight_arc(date, usno = moon)
   flannel <- wmw_calc_flannel_index(today_high)
 
-  # Extract first period wind
-  first_wind_dir <- if (nrow(forecast_df) > 0) forecast_df$wind_direction[1] else "S"
-  first_wind_speed <- if (nrow(forecast_df) > 0) forecast_df$wind_speed[1] else "10 mph"
-  surf <- wmw_calc_lake_breeze(first_wind_dir, first_wind_speed)
-
   daylight_color <- if (daylight$is_decreasing) "#fca5a5" else "#86efac"
   esc <- htmltools::htmlEscape
 
@@ -509,7 +540,7 @@ wmw_card_lake_flannels <- function(today_high, forecast_df, date = Sys.Date(),
 
   rows <- c(
     gauge("Lake Superior Water", water_html),
-    gauge("Lake Breeze / Surf", paste0("<strong style='color: ", surf$color, ";'>", surf$state, "</strong> <span class='wmw-gauge-sub'>— ", surf$desc, "</span>")),
+    gauge("Warnings for today", wmw_warnings_gauge_html(date)),
     gauge("Flannel Index", paste0("<strong style='color: ", flannel$color, ";'>", flannel$level, ": ", flannel$title, "</strong> <span class='wmw-gauge-sub'>— ", flannel$desc, "</span>")),
     gauge("Daylight", paste0(
       "<strong style='color: #ffffff;'>", daylight$length_str, "</strong> <span class='wmw-gauge-sub' style='color: ", daylight_color, "; font-weight: 600;'>&nbsp;(", daylight$change_str, ")</span>",

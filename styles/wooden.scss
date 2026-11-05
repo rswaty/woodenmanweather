@@ -484,6 +484,19 @@ p.wmw-human-sub strong,
   white-space: normal !important;
 }
 
+.wmw-gauge-val a.wmw-nws-link,
+.wmw-gauge-val a.wmw-nws-link.html-fill-item {
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+  cursor: pointer !important;
+}
+
+.wmw-gauge-val a.wmw-nws-link:hover,
+.wmw-gauge-val a.wmw-nws-link.html-fill-item:hover {
+  color: #ffffff !important;
+}
+
 @media (max-width: 1400px) {
   .wmw-human-headline,
   .wmw-human-headline.html-fill-item,
